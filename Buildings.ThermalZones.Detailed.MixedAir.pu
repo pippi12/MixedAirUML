@@ -1,0 +1,747 @@
+@startuml
+hide circle
+skinparam font Arial
+
+package Modelica {
+    ' package Blocks {
+    '     package Interfaces {
+    '         Class RealInput << connector >>  {
+    '         }
+    '         Class RealOutput << connector >>  {
+    '         }
+    '     }
+    ' }
+    package Media {
+        package Interfaces {
+            Class PartialMedium << partial package>>  {
+            }                
+        }
+    }
+    ' package Fluid{
+    '     package Types{
+    '         Class Dynamics << type >> {
+    '         }
+    '     }
+    '     package Vessels.BaseClasses {
+            
+    '         Class VesselFluidPorts_b<< connector >> {
+
+    '         }
+    '     }
+    ' }
+    ' package Thermal.HeatTransfer.Interfaces{
+    '     Class HeatPort_a << connector >> {
+
+    '     }
+    ' }
+    ' package Units.SI{
+    '     Class Volume << type >> {
+    '     }
+    ' }
+}
+package Buildings{
+    package ThermalZones.Detailed{
+        package Types{
+            Class CFDBoundaryConditions << type >> {
+                
+            }
+        }
+        package BaseClasses {
+            Class Overhang << record >> {
+                + << parameter >> wL: Length "窓に対して左側のオーバーハング幅"
+                + << parameter >> wR: Length "窓に対して右側のオーバーハング幅"
+                + << parameter >> dep: Length "壁からの深さ"
+                + << parameter >> gap: Length "窓の上端からの距離"
+                ' + << final parameter >> haveOverhang: Boolean
+            }
+            class SideFins << record >> {
+                + << parameter >> h: Length "窓の上端から上方向の高さ"
+                + << parameter >> dep: Length "壁からの深さ"
+                + << parameter >> gap: Length "窓の端からの距離"
+                ' + << final parameter >> haveSideFins: Boolean
+            }
+        }
+        package Constructions{
+            Class Construction << model >> {
+                ' + extends Buildings.ThermalZones.Detailed.Constructions.BaseClasses.PartialConstruction{final AOpa=A}  
+            }
+            Class ConstructionWithWindow << model >> {
+                ' + extends Buildings.ThermalZones.Detailed.Constructions.BaseClasses.PartialConstruction{final AOpa=A-AWin}  
+                ' + constant Boolean homotopyInitialization = true
+                + << parameter >> AWin: Area 
+                + << parameter >> fFra: Real 
+                ' + << final parameter >> Area AFra=fFra*AWin 
+                ' + << final parameter >> Area AGla=AWin - AFra 
+                + << parameter >> linearizeRadiation: Boolean
+                + << parameter >> steadyStateWindow: Boolean
+                ' + replaceable parameter HeatTransfer.Data.GlazingSystems.Generic glaSys 
+                ' + Modelica.Thermal.HeatTransfer.Interfaces.HeatPort_a glaUns_a 
+                ' + Modelica.Thermal.HeatTransfer.Interfaces.HeatPort_a glaSha_a if haveShade 
+                ' + Modelica.Thermal.HeatTransfer.Interfaces.HeatPort_a fra_a 
+                ' + Modelica.Blocks.Interfaces.RealInput uSha  {  min=0, max=1  }   if haveShade 
+                ' + Modelica.Thermal.HeatTransfer.Interfaces.HeatPort_b glaUns_b 
+                ' + Modelica.Thermal.HeatTransfer.Interfaces.HeatPort_b glaSha_b if haveShade 
+                ' + Modelica.Thermal.HeatTransfer.Interfaces.HeatPort_b fra_b 
+                ' + Modelica.Blocks.Interfaces.RealInput QAbsUns_flow [ size   {   glaSys.glass, 1  }   ]    {    each unit="W", each quantity=
+                ' + Modelica.Blocks.Interfaces.RealInput QAbsSha_flow [ size   {   glaSys.glass, 1  }   ]    {    each unit="W", each quantity=
+                ' # << final parameter >> Boolean haveShade = glaSys.haveExteriorShade or glaSys.haveInteriorShade 
+                ' # (assert  (  homotopyInitialization, "In " + getInstanceName  (   )  + ": The constant homotopyInitialization has been modified from its default value. This constant will be removed in future releases.", level = AssertionLevel.warning )  )
+                ' + connect  (  win.uSha, uSha )  annotation   (  Line  (   point({{-125.3,19.4},{-178.75,19.4},{-178.75,60},{-320,60}}, color={0,0,127}, smooth=Smooth.None )  ) )
+                ' + connect  (  JInUns_a, win.JInUns_a )  annotation   (  Line  (   point({{-310,20},{-200,20},{-200,-3.2},{-119.65,-3.2}}, color={0,0,0}, smooth=Smooth.None )  )   )
+                ' + connect  (  JOutUns_a, win.JOutUns_a )  annotation   (  Line  (   point({{-310,-20},{-220,-20},{-220,-25.8},{-119.65,-25.8}}, color={0,127,0}, smooth=Smooth.None )  )   )
+                ' + connect  (  win.glaUns_a, glaUns_a )  annotation   (  Line  (   point({{-114,-59.7},{-200,-59.7},{-200,-80},{-300,-80}}, color={191,0,0}, smooth=Smooth.None )  )   )
+                ' + connect  (  win.glaSha_a, glaSha_a )  annotation   (  Line  (   point({{-114,-82.3},{-180,-82.3},{-180,-120},{-300,-120}}, color={191,0,0}, smooth=Smooth.None )  )   )
+                ' + connect  (  win.JInSha_a, JInSha_a )  annotation   (  Line  (   point({{-119.65,-104.9},{-162,-104.9},{-162,-160},{-310,-160}}, color={0,0,0}, smooth=Smooth.None )  )   )
+                ' + connect  (  win.JOutSha_a, JOutSha_a )  annotation   (  Line  (   point({{-119.65,-127.5},{-139.375,-127.5},{-139.375,-200},{-310,-200}}, color={0,127,0}, smooth=Smooth.None )  )   )
+                ' + connect  (  win.fra_a, fra_a )  annotation   (  Line  (   point({{-114,-161.4},{-128,-161.4},{-128,-260},{-300,-260}}, color={191,0,0}, smooth=Smooth.None )  )   )
+                ' + connect  (  win.JOutUns_b, JOutUns_b )  annotation   (  Line  (   point({{117.65,-3.2},{225.375,-3.2},{225.375,20},{310,20}}, color={0,127,0}, smooth=Smooth.None )  )   )
+                ' + connect  (  win.JInUns_b, JInUns_b )  annotation   (  Line  (   point({{117.65,-25.8},{233.375,-25.8},{233.375,-20},{310,-20}}, color={0,0,0}, smooth=Smooth.None )  )   )
+                ' + connect  (  win.glaUns_b, glaUns_b )  annotation   (  Line  (   point({{112,-59.7},{239,-59.7},{239,-80},{300,-80}}, color={191,0,0}, smooth=Smooth.None )  )   )
+                ' + connect  (  win.glaSha_b, glaSha_b )  annotation   (  Line  (   point({{112,-82.3},{220,-82.3},{220,-120},{300,-120}}, color={191,0,0}, smooth=Smooth.None )  )   )
+                ' + connect  (  win.JOutSha_b, JOutSha_b )  annotation   (  Line  (   point({{117.65,-104.9},{201.375,-104.9},{201.375,-160},{310,-160}}, color={0,127,0}, smooth=Smooth.None )  )   )
+                ' + connect  (  win.JInSha_b, JInSha_b )  annotation   (  Line  (   point({{117.65,-127.5},{178.375,-127.5},{178.375,-200},{310,-200}}, color={0,0,0}, smooth=Smooth.None )  )   )
+                ' + connect  (  win.fra_b, fra_b )  annotation   (  Line  (   point({{113.13,-161.4},{159.675,-161.4},{159.675,-260},{302,-260}}, color={191,0,0}, smooth=Smooth.None )  )   )
+                ' + connect  (  opa.port_a, opa_a )                  annotation   (  Line  (   point({{-52,200},{-300,200}}, color={191,0,0}, smooth=Smooth.None )  )   )
+                ' + connect  (  opa.port_b, opa_b )                  annotation   (  Line  (   point({{52,200},{302,200}}, color={191,0,0}, smooth=Smooth.None )  )   )
+                ' + connect  (  win.QAbsUns_flow, QAbsUns_flow )  annotation   (  Line  (   point({{-46.2,-195.3},{-46.2,-280},{-40,-280},{-40,-320}}, color={0,0,127}, smooth=Smooth.None )  )   )
+                ' + connect  (  win.QAbsSha_flow, QAbsSha_flow )  annotation   (  Line  (   point({{44.2,-195.3},{44.2,-280},{100,-280},{100,-320}}, color={0,0,127}, smooth=Smooth.None )  )   )
+            }
+            package BaseClasses {
+                Class PartialConstruction << partial model >>  {
+                    + << parameter >> A: Area 
+                    + << parameter >> AOpa: Area
+                    + << parameter >> layers: Buildings.HeatTransfer.Data.OpaqueConstructions.Generic
+                    + << parameter >> til: Angle
+                    ' + << final parameter >> Boolean is_floor=til > 2.74889125 and til < 3.53428875 
+                    ' + << final parameter >> Boolean is_ceiling=til > -0.392699 and til < 0.392699 
+                    ' + Modelica.Thermal.HeatTransfer.Interfaces.HeatPort_a opa_a 
+                    ' + Modelica.Thermal.HeatTransfer.Interfaces.HeatPort_b opa_b 
+                    ' + << final parameter >> Integer nLay  {  min=1, fixed=true  }   = size  {  layers.material, 1  }   
+                    ' + << final parameter >> Integer nSta [ nLay ]   {  each min=1  }  = {layers.material [ i ] .nSta for i in 1:nLay} 
+                    + << parameter >> steadyStateInitial: Boolean
+                    + << parameter >> T_a_start: Temperature
+                    + << parameter >> T_b_start: Temperature
+                    + << parameter >> stateAtSurface_a: Boolean
+                    + << parameter >> stateAtSurface_b: Boolean
+                    ' + connect  (  opa.port_a, opa_a )  annotation   (  Line  (   point({{-52,200},{-300,200}}, color={191,0,0}, smooth=Smooth.None )  ) )
+                    ' + connect  (  opa.port_b, opa_b )  annotation   (  Line  (   point({{52,200},{302,200}}, color={191,0,0}, smooth=Smooth.None )  )   )
+                }
+            }
+
+        }
+        Class MixedAir < <<replaceable package>> \n Medium: PartialMedium > << model >>  {
+        '  + extends Buildings.ThermalZones.Detailed.BaseClasses.RoomHeatMassBalance{redeclare Buildings.ThermalZones.Detailed.BaseClasses.MixedAirHeatMassBalance air{final energyDynamics=energyDynamics, final massDynamics = energyDynamics, final p_start=p_start, final T_start=T_start, final X_start=X_start, final C_start=C_start, final C_nominal=C_nominal, final mSenFac=mSenFac, final m_flow_nominal=m_flow_nominal, final homotopyInitialization=homotopyInitialization, final conMod=intConMod, final hFixed=hIntFixed, final use_C_flow = use_C_flow  }, datConExt{each T_a_start = T_start, each T_b_start = T_start  }, datConExtWin{each T_a_start = T_start, each T_b_start = T_start}, datConBou{each T_a_start = T_start, each T_b_start = T_start}, datConPar{each T_a_start = T_start, each T_b_start = T_start}}  
+        ' + << replaceable package >> Medium = PartialMedium
+        + << parameter >> use_C_flow: Boolean
+        + << parameter >> energyDynamics: Modelica.Fluid.Types.Dynamics
+        + << parameter >> mSenFac: Real
+        + << parameter >> p_start: Medium.AbsolutePressure
+        + << parameter >> T_start: Medium.Temperature 
+        + << parameter >> X_start[Medium.nX]: Medium.MassFraction
+        + << parameter >> C_start[Medium.nC]: Medium.ExtraProperty
+        + << parameter >> C_nominal[Medium.nC]: Medium.ExtraProperty
+        ' + Modelica.Blocks.Interfaces.RealInput uSha[nConExtWin]   {  each min=0, each max=1  }   if haveShade 
+        ' + Modelica.Blocks.Interfaces.RealInput C_flow[Medium.nC]  if use_C_flow 
+        ' + connect  (  uSha, conExtWin.uSha )  annotation   (  Line  (   point({{-280,180},{308,180},{308,62},{281,62}}, color={0,0,127}, smooth=Smooth.None )  ) )
+        ' + connect  (  uSha, bouConExtWin.uSha )  annotation   (  Line  (   point({{-280,180},{308,180},{308,64},{351,64}}, color={0,0,127}, smooth=Smooth.None )  )   )
+        ' + connect  (  uSha, conExtWinRad.uSha )  annotation   (  Line  (   point({{-280,180},{422,180},{422,-40},{310.2,-40},{310.2,-25.6}}, color={0,0,127}, smooth=Smooth.None )  )   )
+        ' + connect  (  irRadGai.uSha,uSha )  annotation   (  Line  (   point({{-100.833,-22.5},{-110,-22.5},{-110,180},{-280,180}}, color={0,0,127}, smooth=Smooth.None )  )   )
+        ' + connect  (  uSha, radTem.uSha )  annotation   (  Line  (   point({{-280,180},{-110,180},{-110,-62},{-100.833,-62},{-100.833,-62.5}}, color={0,0,127}, smooth=Smooth.None )  )   )
+        ' + connect  (  uSha, shaSig.u )  annotation   (  Line  (   point({{-280,180},{-248,180},{-248,160},{-222,160}}, color={0,0,127}, smooth=Smooth.None )  )   )
+        ' + connect  (  air.uSha,uSha )   annotation   (  Line  (   point({{39.6,-120},{8,-120},{8,180},{-280,180}}, color={0,0,127}, smooth=Smooth.None )  )   )
+        ' + connect ( C_flow, air.C_flow )  annotation  ( Line ( point({{-280,-110},{-200,-110},{ -200,-114},{-200,-114},{-200,-202},{-18,-202},{-18,-141},{39,-141}}, color={0,0,127} )  )   )
+        }
+        package BaseClasses {
+            Class RoomHeatMassBalance < <<replaceable package>> \n Medium: PartialMedium \n <<replaceable model>> \n air: PartialAirHeatMassBalance> << partial model >>  {
+                ' + << replaceable package >> Medium = PartialMedium 
+                ' + << replaceable model >> air = PartialAirHeatMassBalance  
+                'constrainedby BaseClasses.PartialAirHeatMassBalance   {    redeclare final package Medium = Medium, nPorts=nPorts, final nConExt=nConExt, final nConExtWin=nConExtWin, final nConPar=nConPar, final nConBou=nConBou, final nSurBou=nSurBou, final datConExt=datConExt, final datConExtWin=datConExtWin, final datConPar=datConPar, final datConBou=datConBou, final surBou=surBou, final haveShade=haveShade, final V=V  }   
+                '  + constant Boolean homotopyInitialization = true 
+                + << parameter >> nPorts: Integer "FluidPortsの数"
+                '  + Modelica.Fluid.Vessels.BaseClasses.VesselFluidPorts_b ports [ nPorts ]    {    redeclare each package Medium = Medium  }   
+                ' + << final parameter >> Volume V=AFlo*hRoo 
+                + << parameter >> AFlo: Area "部屋面積"
+                + << parameter >> hRoo: Length "部屋高さ"
+                '  + Modelica.Thermal.HeatTransfer.Interfaces.HeatPort_a heaPorAir 
+                '  + Modelica.Thermal.HeatTransfer.Interfaces.HeatPort_a heaPorRad 
+                + << parameter >> linearizeRadiation: Boolean "ふく射強度を線形化するかどうか"
+                + << parameter >> steadyStateWindow: Boolean "窓に熱容量を追加するかどうか"
+                + << parameter >> intConMod: InteriorConvection "室内側の熱伝達方式"
+                + << parameter >> hIntFixed: CoefficientOfHeatTransfer "室内側熱伝達係数"
+                + << parameter >> extConMod: ExteriorConvection "室外側の熱伝達方式"
+                + << parameter >> hExtFixed: CoefficientOfHeatTransfer "室外側熱伝達係数"
+                + << parameter >> m_flow_nominal{min=0}: MassFlowRate "定格質量流量"
+                + << parameter >> sampleModel: Boolean "時間サンプリングの有無"
+                '  + Modelica.Blocks.Interfaces.RealInput uWin [ nConExtWin ]    {    each min=0, each max=1, each unit="1"  }   if haveControllableWindow 
+                '  + Modelica.Thermal.HeatTransfer.Interfaces.HeatPort_a surf_conBou [ nConBou ]  if haveConBou 
+                '  + Modelica.Thermal.HeatTransfer.Interfaces.HeatPort_a surf_surBou [ nSurBou ]  if haveSurBou 
+                '  + Modelica.Blocks.Interfaces.RealInput qGai_flow [ 3 ]   {  each unit="W/m2"  }   
+                '  # << final parameter >> TransmissionCoefficient tauIRSha_air [  NConExtWin ] =datConExtWin.glaSys.shade.tauIR_a 
+                '  # << final parameter >> TransmissionCoefficient tauIRSha_glass [  NConExtWin ] =datConExtWin.glaSys.shade.tauIR_b 
+                '  # << final parameter >> Boolean haveControllableWindow= Modelica.Math.BooleanVectors.anyTrue   {    {datConExtWin [ i ] .glaSys.haveControllableWindow for i in 1:NConExtWin}   }    
+                '  # << final parameter >> Boolean haveExteriorShade [ NConExtWin ] = {datConExtWin [ i ] .glaSys.haveExteriorShade for i in 1:NConExtWin} 
+                '  # << final parameter >> Boolean haveInteriorShade [ NConExtWin ] = {datConExtWin [ i ] .glaSys.haveInteriorShade for i in 1:NConExtWin} 
+                '  # << final parameter >> Boolean haveShade= Modelica.Math.BooleanVectors.anyTrue   {   haveExteriorShade [ : ]   }   or Modelica.Math.BooleanVectors.anyTrue   {   haveInteriorShade [ : ]   }   
+                '  # << final parameter >> Boolean is_floorConExt [ NConExt ] = datConExt.is_floor 
+                '  # << final parameter >> Boolean is_floorConExtWin [ NConExtWin ] = datConExtWin.is_floor 
+                '  # << final parameter >> Boolean is_floorConPar_a [ NConPar ] = datConPar.is_floor 
+                '  # << final parameter >> Boolean is_floorConPar_b [ NConPar ] = datConPar.is_ceiling 
+                '  # << final parameter >> Boolean is_floorConBou [ NConBou ] = datConBou.is_floor 
+                ' # << parameter >> is_floorSurBou[NSurBou]: Boolean
+                '  # Modelica.Blocks.Math.Add add annotation   {  Placement  {  transformation  {  extent={{-140,110},{-120,130}}  }    }    }  
+                '  # Modelica.Blocks.Math.Add sumJToWin [ NConExtWin ]    {    each final k1=1, each final k2=1  }   if haveConExtWin 
+                '  # Modelica.Blocks.Math.Sum sumJFroWin [ NConExtWin ]   {  each nin=if haveShade then 2 else 1   }    if haveConExtWin 
+                '  # (assert  (  homotopyInitialization, "In " + getInstanceName  (   )  + ": The constant homotopyInitialization has been modified from its default value. This constant will be removed in future releases.", level = AssertionLevel.warning )  )
+                '  + connect  (  conBou.opa_a, surf_conBou )  annotation   (  Line  (   point({{282,-122.667},{282,-122},{288,-122},{288,-216},{-240,-216},{-240, -180},{-260,-180}}, color={191,0,0}, smooth=Smooth.None )  ) )
+                '  + connect  (  bouConExtWin.opa_a, conExtWin.opa_a )  annotation   (  Line  (   point({{352,69},{280,69}}, color={191,0,0}, smooth=Smooth.None )  )   )
+                '  + connect  (  conExtWin.JInUns_a, bouConExtWin.JOutUns )  annotation   (  Line  (   point({{280.5,60},{304,60},{304,58},{351.5,58}}, color={0,0,0}, smooth=Smooth.None )  )   )
+                '  + connect  (  bouConExtWin.JInUns, conExtWin.JOutUns_a )  annotation   (  Line  (   point({{351.5,60},{316,60},{316,58},{280.5,58}}, color={0,0,0}, smooth=Smooth.None )  )   )
+                '  + connect  (  conExtWin.glaUns_a, bouConExtWin.glaUns )  annotation   (  Line  (   point({{280,55},{352,55}}, color={191,0,0}, smooth=Smooth.None )  )   )
+                '  + connect  (  bouConExtWin.glaSha, conExtWin.glaSha_a )  annotation   (  Line  (   point({{352,53},{280,53}}, color={191,0,0}, smooth=Smooth.None )  )   )
+                '  + connect  (  conExtWin.JInSha_a, bouConExtWin.JOutSha )  annotation   (  Line  (   point({{280.5,51},{286,51},{286,52},{292,52},{292,49},{351.5,49}}, color={0,0,0}, smooth=Smooth.None )  )   )
+                '  + connect  (  bouConExtWin.JInSha, conExtWin.JOutSha_a )  annotation   (  Line  (   point({{351.5,51},{290,51},{290,49},{280.5,49}}, color={0,0,0}, smooth=Smooth.None )  )   )
+                '  + connect  (  conExtWin.fra_a, bouConExtWin.fra )  annotation   (  Line  (   point({{280,46},{352,46}}, color={191,0,0}, smooth=Smooth.None )  )   )
+                '  + connect  (  conExt.opa_a, bouConExt.opa_a )  annotation   (  Line  (   point({{288,138.333},{334,138.333},{334,139},{352,139}}, color={191,0,0}, smooth=Smooth.None )  )   )
+                '  + connect  (  weaBus, bouConExtWin.weaBus )  annotation   (  Line  (   point({{180,160},{400,160},{400,60.05},{378.15,60.05}}, color={255,204,51}, thickness=0.5, smooth=Smooth.None )  )   )
+                '  + connect  (  weaBus, bouConExt.weaBus )  annotation   (  Line  (   point({{180,160},{400,160},{400,130},{378.15,130},{378.15,130.05}}, color={255,204,51}, thickness=0.5, smooth=Smooth.None )  )   )
+                '  + connect  (  bouConExtWin.QAbsSolSha_flow, conExtWinRad.QAbsExtSha_flow )  annotation   (  Line  (   point({{351,62},{312,62},{312,46},{290,46},{290,-5},{299,-5}}, color={0,0,127}, smooth=Smooth.None )  )   )
+                '  + connect  (  bouConExtWin.inc, conExtWinRad.incAng )  annotation   (  Line  (   point({{382.5,68},{390,68},{390,-15},{321.5,-15}}, color={0,0,127}, smooth=Smooth.None )  )   )
+                '  + connect  (  bouConExtWin.HDir, conExtWinRad.HDir )  annotation   (  Line  (   point({{382.5,65},{388,65},{388,-10},{321.5,-10}}, color={0,0,127}, smooth=Smooth.None )  )   )
+                '  + connect  (  bouConExtWin.HDif, conExtWinRad.HDif )  annotation   (  Line  (   point({{382.5,62},{392,62},{392,-6},{321.5,-6}}, color={0,0,127}, smooth=Smooth.None )  )   )
+                '  + connect  (  conExtWin.QAbsSha_flow, conExtWinRad.QAbsGlaSha_flow )  annotation   (   Line  (   point({{261,43},{261,38},{260,38},{260,-12},{280,-12},{280,-13},{299,-13}}, color={0,0,127}, smooth=Smooth.None )  )   )
+                '  + connect  (  conExtWinRad.QAbsGlaUns_flow, conExtWin.QAbsUns_flow )  annotation   (   Line  (   point({{299,-9},{284,-9},{284,-10},{268,-10},{268,36},{269,36},{269,43}}, color={0,0,127}, smooth=Smooth.None )  )   )
+                '  + connect  (  conExt.opa_b, irRadExc.conExt )  annotation   (  Line  (   point({{241.847,138.333},{160,138.333},{160,60},{-60,60},{-60,20},{-80, 20},{-80,19.1667}}, color={190,0,0}, smooth=Smooth.None )  )   )
+                '  + connect  (  conExtWin.fra_b, irRadExc.conExtWinFra )  annotation   (  Line  (   point({{249.9,46},{160,46},{160,60},{-60,60},{-60,10},{-79.9167,10}}, color={191,0,0}, smooth=Smooth.None )  )   )
+                '  + connect  (  conPar.opa_a, irRadExc.conPar_a )  annotation   (  Line  (   point({{282,-90.3333},{288,-90.3333},{288,-106},{160,-106},{160,60},{-60, 60},{-60,8},{-80,8},{-80,7.5},{-79.9167,7.5}}, color={191,0,0}, smooth=Smooth.None )  )   )
+                '  + connect  (  conPar.opa_b, irRadExc.conPar_b )  annotation   (  Line  (   point({{243.873,-90.3333},{160,-90.3333},{160,60},{-60,60},{-60,5.83333}, {-79.9167,5.83333}}, color={191,0,0}, smooth=Smooth.None )  )   )
+                '  + connect  (  conBou.opa_b, irRadExc.conBou )  annotation   (  Line  (   point({{241.867,-122.667},{160,-122.667},{160,60},{-60,60},{-60,3.33333}, {-79.9167,3.33333}}, color={191,0,0}, smooth=Smooth.None )  )   )
+                '  + connect  (  surf_surBou, irRadExc.conSurBou )  annotation   (  Line  (   point({{-260,-140},{-232,-140},{-232,-210},{160,-210},{160,60},{-60,60}, {-60,0.833333},{-79.9583,0.833333}}, color={191,0,0}, smooth=Smooth.None )  )   )
+                '  + connect  (  irRadGai.conExt, conExt.opa_b )  annotation   (  Line  (   point({{-80,-20.8333},{-80,-20},{-60,-20},{-60,60},{160,60},{160,138.333}, {241.847,138.333}}, color={191,0,0}, smooth=Smooth.None )  )   )
+                '  + connect  (  irRadGai.conExtWinFra, conExtWin.fra_b )  annotation   (  Line  (   point({{-79.9167,-30},{-60,-30},{-60,60},{160,60},{160,46},{249.9,46}}, color={191,0,0}, smooth=Smooth.None )  )   )
+                '  + connect  (  irRadGai.conPar_a, conPar.opa_a )  annotation   (  Line  (   point({{-79.9167,-32.5},{-60,-32.5},{-60,60},{160,60},{160,-106},{288, -106},{288,-90.3333},{282,-90.3333}}, color={191,0,0}, smooth=Smooth.None )  )   )
+                '  + connect  (  irRadGai.conPar_b, conPar.opa_b )  annotation   (  Line  (   point({{-79.9167,-34.1667},{-60,-34.1667},{-60,60},{160,60},{160, -90.3333},{243.873,-90.3333}}, color={191,0,0}, smooth=Smooth.None )  )   )
+                '  + connect  (  irRadGai.conBou, conBou.opa_b )  annotation   (  Line  (   point({{-79.9167,-36.6667},{-60,-36.6667},{-60,60},{160,60},{160, -122.667},{241.867,-122.667}}, color={191,0,0}, smooth=Smooth.None )  )   )
+                '  + connect  (  irRadGai.conSurBou, surf_surBou )  annotation   (  Line  (   point({{-79.9583,-39.1667},{-60,-39.1667},{-60,60},{160,60},{160,-210},{ -232,-210},{-232,-140},{-260,-140}}, color={191,0,0}, smooth=Smooth.None )  )   )
+                '  + connect  (  conExtWin.opa_b, irRadExc.conExtWin )  annotation   (  Line  (   point({{249.9,69},{160,69},{160,60},{-60,60},{-60,16},{-80,16},{-80,17.5}}, color={191,0,0}, smooth=Smooth.None )  )   )
+                '  + connect  (  conExtWin.opa_b, irRadGai.conExtWin )  annotation   (  Line  (   point({{249.9,69},{160,69},{160,60},{-60,60},{-60,-22},{-70,-22},{-70,-22.5}, {-80,-22.5}}, color={191,0,0}, smooth=Smooth.None )  )   )
+                '  + connect  (  conExt.opa_b, solRadExc.conExt )  annotation   (  Line  (   point({{241.847,138.333},{160,138.333},{160,60},{-80,60},{-80,59.1667}}, color={190,0,0}, smooth=Smooth.None )  )   )
+                '  + connect  (  conExtWin.fra_b, solRadExc.conExtWinFra )  annotation   (  Line  (   point({{249.9,46},{160,46},{160,60},{-60,60},{-60,50},{-79.9167,50}}, color={191,0,0}, smooth=Smooth.None )  )   )
+                '  + connect  (  conPar.opa_a, solRadExc.conPar_a )  annotation   (  Line  (   point({{282,-90.3333},{288,-90.3333},{288,-106},{160,-106},{160,60},{-60, 60},{-60,48},{-79.9167,48},{-79.9167,47.5}}, color={191,0,0}, smooth=Smooth.None )  )   )
+                '  + connect  (  conPar.opa_b, solRadExc.conPar_b )  annotation   (  Line  (   point({{243.873,-90.3333},{160,-90.3333},{160,60},{-60,60},{-60,46},{-70, 46},{-70,45.8333},{-79.9167,45.8333}}, color={191,0,0}, smooth=Smooth.None )  )   )
+                '  + connect  (  conBou.opa_b, solRadExc.conBou )  annotation   (  Line  (   point({{241.867,-122.667},{160,-122.667},{160,60},{-60,60},{-60,43.3333}, {-79.9167,43.3333}}, color={191,0,0}, smooth=Smooth.None )  )   )
+                '  + connect  (  surf_surBou, solRadExc.conSurBou )  annotation   (  Line  (   point({{-260,-140},{-232,-140},{-232,-210},{160,-210},{160,60},{-60,60}, {-60,40},{-70,40},{-70,40.8333},{-79.9583,40.8333}}, color={191,0,0}, smooth=Smooth.None )  )   )
+                '  + connect  (  conExtWin.opa_b, solRadExc.conExtWin )  annotation   (  Line  (   point({{249.9,69},{160,69},{160,60},{-60,60},{-60,57.5},{-80,57.5}}, color={191,0,0}, smooth=Smooth.None )  )   )
+                '  + connect  (  solRadExc.JInDifConExtWin, conExtWinRad.QTraDif_flow )  annotation   (   Line  (   point({{-79.5833,53.3333},{20,53.3333},{20,-20},{299,-20}}, color={0,0,127}, smooth=Smooth.None )  )   )
+                '  + connect  (  solRadExc.HOutConExtWin,conExtWinRad.HRoo )   annotation   (  Line  (   point({{-79.5833,55},{10,55},{10,-34},{328,-34},{328,-21.6},{321.5,-21.6}}, color={0,0,127}, smooth=Smooth.None )  )   )
+                '  + connect  (  conExt.opa_b, radTem.conExt )  annotation   (  Line  (   point({{241.847,138.333},{160,138.333},{160,60},{-60,60},{-60,-60.8333}, {-80,-60.8333}}, color={191,0,0}, smooth=Smooth.None )  )   )
+                '  + connect  (  conExtWin.opa_b, radTem.conExtWin )  annotation   (  Line  (   point({{249.9,69},{160,69},{160,60},{-60,60},{-60,-62.5},{-80,-62.5}}, color={191,0,0}, smooth=Smooth.None )  )   )
+                '  + connect  (  conExtWin.fra_b, radTem.conExtWinFra )  annotation   (  Line  (   point({{249.9,46},{160,46},{160,60},{-60,60},{-60,-70},{-79.9167,-70}}, color={191,0,0}, smooth=Smooth.None )  )   )
+                '  + connect  (  conPar.opa_a, radTem.conPar_a )  annotation   (  Line  (   point({{282,-90.3333},{288,-90.3333},{288,-106},{160,-106},{160,60},{-60, 60},{-60,-72.5},{-79.9167,-72.5}}, color={191,0,0}, smooth=Smooth.None )  )   )
+                '  + connect  (  conPar.opa_b, radTem.conPar_b )  annotation   (  Line  (   point({{243.873,-90.3333},{160,-90.3333},{160,60},{-60,60},{-60,-74.1667}, {-79.9167,-74.1667}}, color={191,0,0}, smooth=Smooth.None )  )   )
+                '  + connect  (  conBou.opa_b, radTem.conBou )  annotation   (  Line  (   point({{241.867,-122.667},{160,-122.667},{160,60},{-60,60},{-60,-76.6667}, {-79.9167,-76.6667}}, color={191,0,0}, smooth=Smooth.None )  )   )
+                '  + connect  (  surf_surBou, radTem.conSurBou )  annotation   (  Line  (   point({{-260,-140},{-232,-140},{-232,-210},{160,-210},{160,60},{-60,60}, {-60,-79.1667},{-79.9583,-79.1667}}, color={191,0,0}, smooth=Smooth.None )  )   )
+                '  + connect  (  radTem.glaUns, conExtWin.glaUns_b )  annotation   (  Line  (   point({{-80,-65},{-60,-65},{-60,60},{160,60},{160,55},{250,55}}, color={191,0,0}, smooth=Smooth.None )  )   )
+                '  + connect  (  radTem.glaSha, conExtWin.glaSha_b )  annotation   (  Line  (   point({{-80,-66.6667},{-60,-66.6667},{-60,60},{160,60},{160,53},{250,53}}, color={191,0,0}, smooth=Smooth.None )  )   )
+                '  + connect  (  radTem.TRad, radiationAdapter.TRad )  annotation   (  Line  (   point({{-100.417,-77.6667},{-144,-77.6667},{-144,-78},{-186,-78},{-186, 130},{-182,130}}, color={0,0,127}, smooth=Smooth.None )  )   )
+                '  + connect  (  radiationAdapter.rad, heaPorRad )  annotation   (  Line  (   point({{-170.2,120},{-170,120},{-170,114},{-226,114},{-226,4.44089e-16}, {-260,4.44089e-16}}, color={191,0,0}, smooth=Smooth.None )  )   )
+                '  + connect  (  radiationAdapter.QRad_flow, add.u1 )  annotation   (  Line  (   point({{-159,130},{-150,130},{-150,126},{-142,126}}, color={0,0,127}, smooth=Smooth.None )  )   )
+                '  + connect  (  add.y, irRadGai.Q_flow )  annotation   (  Line  (   point({{-119,120},{-116,120},{-116,-30},{-100.833,-30}}, color={0,0,127}, smooth=Smooth.None )  )   )
+                '  + connect  (  irRadExc.JOutConExtWin, sumJToWin.u1 )  annotation   (  Line  (   point({{-79.5833,15},{-50,15},{-50,-14},{-42,-14}}, color={0,127,0}, smooth=Smooth.None )  )   )
+                '  + connect  (  irRadGai.JOutConExtWin, sumJToWin.u2 )  annotation   (  Line  (   point({{-79.5833,-25},{-46,-25},{-46,-26},{-42,-26}}, color={0,127,0}, smooth=Smooth.None )  )   )
+                '  + connect  (  shaSig.y, radShaOut.u )  annotation   (  Line  (   point({{-199,160},{-110,160},{-110,124},{-102,124}}, color={0,0,127}, smooth=Smooth.None )  )   )
+                '  + connect  (  shaSig.y, shaRad.u )  annotation   (  Line  (   point({{-199,160},{-64,160},{-64,108},{-61,108}}, color={0,0,127}, smooth=Smooth.None )  )   )
+                '  + connect  (  sumJToWin.y, radShaOut.JIn )  annotation   (  Line  (   point({{-19,-20},{0,-20},{0,148},{-106,148},{-106,136},{-101,136}}, color={0,127,0}, smooth=Smooth.None )  )   )
+                '  + connect  (  radShaOut.JOut_1, shaRad.JIn_air )  annotation   (  Line  (   point({{-79,136},{-70,136},{-70,96},{-61,96}}, color={0,127,0}, smooth=Smooth.None )  )   )
+                '  + connect  (  radShaOut.JOut_2, conExtWin.JInUns_b )  annotation   (  Line  (   point({{-79,124},{-20,124},{-20,58},{249.5,58}}, color={0,127,0}, smooth=Smooth.None )  )   )
+                '  + connect  (  shaRad.JOut_glass, conExtWin.JInSha_b )  annotation   (  Line  (   point({{-39,96},{20,96},{20,72},{220,72},{220,49},{249.5,49}}, color={0,127,0}, smooth=Smooth.None )  )   )
+                '  + connect  (  conExtWin.JOutSha_b, shaRad.JIn_glass )  annotation   (  Line  (   point({{249.5,51},{222,51},{222,70},{16,70},{16,92},{-39,92}}, color={0,127,0}, smooth=Smooth.None )  )   )
+                '  + connect  (  irRadExc.JInConExtWin, sumJFroWin.y )  annotation   (  Line  (   point({{-79.5833,13.3333},{-46,13.3333},{-46,14},{-41,14}}, color={0,127,0}, smooth=Smooth.None )  )   )
+                '  + connect  (  shaRad.QSolAbs_flow, conExtWinRad.QAbsIntSha_flow )  annotation   (  Line  (   point({{-50,89},{-50,86},{148,86},{148,-17},{299,-17}}, color={0,0,127}, smooth=Smooth.None )  )   )
+                '  + connect  (  sumJFroWin.u[1], conExtWin.JOutUns_b )  annotation   (  Line  (   point({{-18,14},{164,14},{164,60},{249.5,60}}, color={0,0,127}, smooth=Smooth.None )  )   )
+                '  + connect  (  sumJFroWin.u[2], shaRad.JOut_air )  annotation   (  Line  (   point({{-18,14},{-10,14},{-10,40},{-40,40},{-40,64},{-66,64},{-66,92},{ -61,92}}, color={0,127,0}, smooth=Smooth.None )  )   )
+                '  + connect  (  radTem.sha, TSha.port )  annotation   (  Line  (   point({{-80,-68.4167},{-64,-68.4167},{-64,-68},{-40,-68}}, color={191,0,0}, smooth=Smooth.None )  )   )
+                '  + (for i in 1:nPorts loop connect  (  ports[i],air. ports[i] )  annotation   (  Line  (   points={{-260,-60},{-218,-60},{-218,-206},{52,-206},{52,-141.9}}, color={0,127,255}, smooth=Smooth.None )  )  ;;end for ;;)
+                '  + connect  (  air.conExt, conExt.opa_b )  annotation   (  Line  (   point({{64,-119},{160,-119},{160,138.333},{241.847,138.333}}, color={191,0,0}, smooth=Smooth.None )  )   )
+                '  + connect  (  air.conExtWin, conExtWin.opa_b )  annotation   (  Line  (   point({{64,-121},{160,-121},{160,69},{249.9,69}}, color={191,0,0}, smooth=Smooth.None )  )   )
+                '  + connect  (  air.glaUns, conExtWin.glaUns_b )  annotation   (  Line  (   point({{64,-124},{160,-124},{160,55},{250,55}}, color={191,0,0}, smooth=Smooth.None )  )   )
+                '  + connect  (  air.glaSha, conExtWin.glaSha_b )  annotation   (  Line  (   point({{64,-126},{160,-126},{160,53},{250,53}}, color={191,0,0}, smooth=Smooth.None )  )   )
+                '  + connect  (  air.conExtWinFra, conExtWin.fra_b )  annotation   (  Line  (   point({{64.1,-130},{160,-130},{160,46},{249.9,46}}, color={191,0,0}, smooth=Smooth.None )  )   )
+                '  + connect  (  air.conPar_a, conPar.opa_a )  annotation   (  Line  (   point({{64.1,-133},{160,-133},{160,-106},{288,-106},{288,-90.3333},{282, -90.3333}}, color={191,0,0}, smooth=Smooth.None )  )   )
+                '  + connect  (  air.conPar_b, conPar.opa_b )  annotation   (  Line  (   point({{64.1,-135},{160,-135},{160,-90},{243.873,-90},{243.873,-90.3333}}, color={191,0,0}, smooth=Smooth.None )  )   )
+                '  + connect  (  air.conBou, conBou.opa_b )  annotation   (  Line  (   point({{64.1,-138},{160,-138},{160,-122.667},{241.867,-122.667}}, color={191,0,0}, smooth=Smooth.None )  )   )
+                '  + connect  (  air.conSurBou, surf_surBou )  annotation   (  Line  (   point({{64.05,-141},{160,-141},{160,-210},{-232,-210},{-232,-140},{-260,-140}}, color={191,0,0}, smooth=Smooth.None )  )   )
+                '  + connect  (  shaRad.QRadAbs_flow,air. QRadAbs_flow )  annotation   (  Line  (   point({{-55,89},{-55,72},{4,72},{4,-125},{39.5,-125}}, color={0,0,127}, smooth=Smooth.None )  )   )
+                '  + connect  (  air.TSha, shaRad.TSha )  annotation   (  Line  (   point({{39.5,-127},{2,-127},{2,70},{-45,70},{-45,89}}, color={0,0,127}, smooth=Smooth.None )  )   )
+                '  + connect  (  air.heaPorAir, heaPorAir )  annotation   (  Line  (   point({{40,-130},{-10,-130},{-10,-88},{-200,-88},{-200,40},{-260,40}}, color={191,0,0}, smooth=Smooth.None )  )   )
+                '  + connect  (  air.TSha, TSha.T )  annotation   (  Line  (   point({{39.5,-127},{2,-127},{2,-68},{-18,-68}}, color={0,0,127}, smooth=Smooth.None )  )   )
+                '  + connect ( uWin, conExtWinRad.uSta )  annotation  ( Line ( point({{-280,140},{-240, 140},{-240,180},{420,180},{420,-40},{305.2,-40},{305.2,-25.6}}, color= {0,0,127}  )    )    )
+                '  + connect  (  qGai_flow,heaGai. qGai_flow )  annotation   (  Line  (   point({{-280,80},{-222,80}}, color={0,0,127}, smooth=Smooth.None )  )   )
+                '  + connect  (  air.QCon_flow,heaGai. QCon_flow )  annotation   (  Line  (   point({{39,-135},{-14,-135},{-14,-92},{-190,-92},{-190,80},{-198,80}}, color={0,0,127}, smooth=Smooth.None )  )   )
+                '  + connect  (  air.QLat_flow,heaGai. QLat_flow )  annotation   (  Line  (   point({{39,-138},{-18,-138},{-18,-96},{-194,-96},{-194,74},{-198,74}}, color={0,0,127}, smooth=Smooth.None )  )   )
+                '  + connect  (  heaGai.QRad_flow, add.u2 )  annotation   (  Line  (   point({{-198,86},{-152,86},{-152,114},{-142,114}}, color={0,0,127}, smooth=Smooth.None )  )   )
+                '  + connect  (  conExtWinRad.QTraDir_flow, solRadExc.JInDirConExtWin )  annotation   (   Line ( point({{299,-23},{18,-23},{18,51.6667},{-79.5833,51.6667}}, color={ 0,0,127}  )    )    )
+            }
+
+            class ConstructionRecords << record >>  {
+                + << parameter >> datConExt[NConExt]: ParameterConstruction "窓のない外装のパラメータ"
+                + << parameter >> datConExtWin[NConExtWin]: ParameterConstructionWithWindow "窓のある外装のパラメータ"
+                + << parameter >> datConPar[NConPar]: ParameterConstruction "空間内の間仕切りのパラメータ"
+                + << parameter >> datConBou[NConBou]: ParameterConstruction "空間外との境界構造体のパラメータ"
+                + << parameter >> surBou[NSurBou]: OpaqueSurface "熱伝導が空間外でモデル化された不透明な面のパラメータ"
+                + << parameter >> dummyCon: Brick120 "上書きされるので無視してよい"
+                + << parameter >> dummyGlaSys: SingleClear3 "上書きされるので無視してよい"
+            }
+
+            Class ConstructionNumbers << record >> {
+                + << parameter >> nConExt: Integer "窓のない外装の数"
+                + << parameter >> nConExtWin: Integer  "窓のある外装の数"
+                + << parameter >> nConPar: Integer "空間内の間仕切りの数"
+                + << parameter >> nConBou: Integer "空間外との境界構造体の数"
+                + << parameter >> nSurBou: Integer "熱伝導が空間外でモデル化された不透明な面の数"
+                ' + << final parameter >> NConExt{min=1}=max{1, nConExt}: Integer
+                ' + << final parameter >> NConExtWin{min=1}=max{1, nConExtWin}: Integer
+                ' + << final parameter >> NConPar{min=1}=max{1, nConPar}: Integer
+                ' + << final parameter >> NConBou{min=1}=max{1, nConBou}: Integer
+                ' + << final parameter >> NSurBou{min=1}=max{1, nSurBou}: Integer
+                ' + << final parameter >> haveConExt = nConExt > 0: Boolean
+                ' + << final parameter >> haveConExtWin = nConExtWin > 0: Boolean
+                ' + << final parameter >> haveConPar = nConPar > 0: Boolean
+                ' + << final parameter >> haveConBou = nConBou > 0: Boolean
+                ' + << final parameter >> haveSurBou = nSurBou > 0: Boolean
+            }
+            together {
+                Class ParameterConstruction << record >> {
+                    + << parameter >> A: Area "構造体表面の面積"
+                }
+                Class ParameterConstructionWithWindow << record >> {
+                    + << parameter >> A: Area "構造体表面の面積（窓＋不透明な構造体）"
+                    + << parameter >> hWin: Length "窓の高さ"
+                    + << parameter >> wWin: Length "窓の幅"
+                    ' + << final parameter >> AWin: Area
+                    ' + << final parameter >> AOpa: Area
+                    + << parameter >> fFra: Real "窓の総面積に対する窓枠の面積の割合"
+                    + << parameter >> ove: Overhang "窓のひさしの形状"
+                    + << parameter >> sidFin{h=0, dep=0, gap=0}: SideFins "窓の側面の出っ張りの形状"
+                    ' + << final parameter >> AFra=fFra*AWin: Area
+                    ' + << final parameter >> AGla=AWin - AFra: Area
+                    + << parameter >> glaSys: GlazingSystems.Generic "窓の材料属性"
+                    ' + << final parameter >> haveOverhangOrSideFins: Boolean
+                }
+            }
+            class PartialParameterConstruction << record >> {
+                + << parameter >> name: String "面の名前（MixedAirでは任意）"
+                + << parameter >> layers: OpaqueConstructions.Generic "不透明な構造体の材料属性"
+                + << parameter >> til: Angle "チルト（壁なら90度）"
+                + << parameter >> azi: Angle "アジマス角（壁なら向いている方角で決まる）"
+                ' + << final parameter >> is_floor=til > 2.74889125 and til < 3.53428875: Boolean
+                ' + << final parameter >> is_ceiling=til > -0.392699 and til < 0.392699: Boolean
+                + << parameter >> steadyStateInitial: Boolean "温度の初期値を与える場合はFalse"
+                + << parameter >> T_a_start: Temperature "ポートA（外？）の初期温度（MixedAirにてMediumの初期温度になる）"
+                + << parameter >> T_b_start: Temperature "ポートB（内？）の初期温度（MixedAirにてMediumの初期温度になる）"
+                + << parameter >> stateAtSurface_a: Boolean "？？？"
+                + << parameter >> stateAtSurface_b: Boolean "？？？"
+                + << parameter >> boundaryCondition: CFDBoundaryConditions "不使用（CFDモデルの時に使用される）"
+            }
+            Class OpaqueSurface << record >> {
+                + << parameter >> name: String name "面の名前（MixedAirでは任意）"
+                + << parameter >> boundaryCondition: CFDBoundaryConditions "不使用（CFDモデルの時に使用される）"
+
+            }
+            Class PartialAirHeatMassBalance < <<replaceable package>> \n Medium: PartialMedium > << partial model >>  {
+                ' + << replaceable package >> Medium = PartialMedium
+                + << parameter >> nPorts: Integer: "FluidPortsの数"
+                + << parameter >> haveShade: Boolean "1つ以上の窓が日除けを有するかどうか"
+                + << parameter >> V: Volume "部屋の体積"
+                ' + Modelica.Blocks.Interfaces.RealInput uSha [ NConExtWin ]  if haveShade 
+                ' + Modelica.Blocks.Interfaces.RealInput QRadAbs_flow [ NConExtWin ]    {    each final unit="W"  }   if haveShade 
+                ' + Modelica.Blocks.Interfaces.RealInput QCon_flow 
+                ' + Modelica.Blocks.Interfaces.RealInput QLat_flow 
+                ' + Modelica.Blocks.Interfaces.RealOutput TSha [ NConExtWin ]    {    each final unit="K", each final quantity=
+                ' # << final parameter >> Area AConExt[NConExt] = datConExt.A 
+                ' # << final parameter >> Area AConExtWinOpa[NConExtWin] = datConExtWin.AOpa 
+                ' # << final parameter >> Area AConExtWinGla[NConExtWin] = (1 - datConExtWin.fFra) * datConExtWin.AWin 
+                ' # << final parameter >> Area AConExtWinFra[NConExtWin] = datConExtWin.fFra * datConExtWin.AWin 
+                ' # << final parameter >> Area AConPar[NConPar] = datConPar.A 
+                ' # << final parameter >> Area AConBou[NConBou] = datConBou.A 
+                ' # << final parameter >> Area ASurBou[NSurBou] = surBou.A 
+            }
+
+            Class MixedAirHeatMassBalance << model >>  {
+                ' + constant Boolean homotopyInitialization = true 
+                + << parameter >> m_flow_nominal: MassFlowRate "定格質量流量"
+                + << parameter >> conMod: InteriorConvection "室内側の熱伝達方式"
+                + << parameter >> hFixed: CoefficientOfHeatTransfer "室内側熱伝達係数"
+                + << parameter >> use_C_flow: Boolean "空気に添加される微量物質の質量流量を考慮するかどうか"
+                ' + Modelica.Blocks.Interfaces.RealInput C_flow [ Medium.nC ]  if use_C_flow 
+                ' # constant SpecificEnergy h_fg= Buildings.Media.Air.enthalpyOfCondensingGas   {   273.15 + 37  }   
+                ' # Modelica.Blocks.Math.Gain mWat_flow{final k  {unit="kg/J"}=1/h_fg, u{final unit=
+                ' # (assert  (  homotopyInitialization, "In " + getInstanceName  (   )  + ": The constant homotopyInitialization has been modified from its default value. This constant will be removed in future releases.", level = AssertionLevel.warning )  )
+                ' + connect  (  convConPar_a.fluid,theConConPar_a.port_a )  annotation   (  Line  (   point({{100,-60},{62,-60}}, color={191,0,0}, smooth=Smooth.None )  ) )
+                ' + connect  (  convConPar_b.fluid,theConConPar_b.port_a )  annotation   (  Line  (   point({{100,-100},{60,-100}}, color={191,0,0}, smooth=Smooth.None )  )   )
+                ' + connect  (  convConBou.fluid,theConConBou.port_a )  annotation   (  Line  (   point({{100,-160},{60,-160}}, color={191,0,0}, smooth=Smooth.None )  )   )
+                ' + connect  (  convSurBou.fluid,theConSurBou.port_a )  annotation   (  Line  (   point({{102,-220},{62,-220}}, color={191,0,0}, smooth=Smooth.None )  )   )
+                ' + connect  (  theConConPar_a.port_b,vol.heatPort )  annotation   (  Line  (   point({{42,-60},{20,-60},{20,-200},{10,-200}}, color={191,0,0}, smooth=Smooth.None )  )   )
+                ' + connect  (  theConConPar_b.port_b,vol.heatPort )  annotation   (  Line  (   point({{40,-100},{20,-100},{20,-200},{10,-200}}, color={191,0,0}, smooth=Smooth.None )  )   )
+                ' + connect  (  theConConBou.port_b,vol.heatPort )  annotation   (  Line  (   point({{40,-160},{20,-160},{20,-200},{10,-200}}, color={191,0,0}, smooth=Smooth.None )  )   )
+                ' + connect  (  theConSurBou.port_b,vol.heatPort )  annotation   (  Line  (   point({{42,-220},{20,-220},{20,-200},{10,-200}}, color={191,0,0}, smooth=Smooth.None )  )   )
+                ' + connect  (  conExtWinFra,convConWin.frame )  annotation   (  Line  (   point({{242,4.44089e-16},{160,4.44089e-16},{160,100},{115,100},{115,110}}, color={191,0,0}, smooth=Smooth.None )  )   )
+                ' + connect  (  convConExt.solid, conExt )  annotation   (  Line  (   point({{120,220},{240,220}}, color={191,0,0}, smooth=Smooth.None )  )   )
+                ' + connect  (  convConExt.fluid,theConConExt.port_a )  annotation   (  Line  (   point({{100,220},{58,220}}, color={191,0,0}, smooth=Smooth.None )  )   )
+                ' + connect  (  theConConExt.port_b,vol.heatPort )  annotation   (  Line  (   point({{38,220},{20,220},{20,-200},{10,-200}}, color={191,0,0}, smooth=Smooth.None )  )   )
+                ' + connect  (  theConConExtWin.port_b,vol.heatPort )  annotation   (  Line  (   point({{38,180},{20,180},{20,-200},{10,-200}}, color={191,0,0}, smooth=Smooth.None )  )   )
+                ' + connect  (  convConExtWin.fluid,theConConExtWin.port_a )  annotation   (  Line  (   point({{100,180},{58,180}}, color={191,0,0}, smooth=Smooth.None )  )   )
+                ' + connect  (  convConExtWin.solid, conExtWin )  annotation   (  Line  (   point({{120,180},{240,180}}, color={191,0,0}, smooth=Smooth.None )  )   )
+                ' + connect  (  theConConWin.port_b,vol.heatPort )  annotation   (  Line  (   point({{40,120},{20,120},{20,-200},{10,-200}}, color={191,0,0}, smooth=Smooth.None )  )   )
+                ' + connect  (  convConWin.air,theConConWin.port_a )  annotation   (  Line  (   point({{98,120},{60,120}}, color={191,0,0}, smooth=Smooth.None )  )   )
+                ' + connect  (  convConWin.glaSha, glaSha )  annotation   (  Line  (   point({{118,118},{166,118},{166,80},{240,80}}, color={191,0,0}, smooth=Smooth.None )  )   )
+                ' + connect  (  convConWin.glaUns, glaUns )  annotation   (  Line  (   point({{118,122},{180,122},{180,120},{240,120}}, color={191,0,0}, smooth=Smooth.None )  )   )
+                ' + connect  (  convConPar_a.solid, conPar_a )  annotation   (  Line  (   point({{120,-60},{242,-60}}, color={191,0,0}, smooth=Smooth.None )  )   )
+                ' + connect  (  convConPar_b.solid, conPar_b )  annotation   (  Line  (   point({{120,-100},{242,-100}}, color={191,0,0}, smooth=Smooth.None )  )   )
+                ' + connect  (  convConBou.solid, conBou )  annotation   (  Line  (   point({{120,-160},{242,-160}}, color={191,0,0}, smooth=Smooth.None )  )   )
+                ' + connect  (  convSurBou.solid, conSurBou )  annotation   (  Line  (   point({{122,-220},{241,-220}}, color={191,0,0}, smooth=Smooth.None )  )   )
+                ' + (for i in 1:nPorts loop connect  (  vol.ports[i], ports[i] )  annotation   (  Line  (   points={{0,-210},{0,-238}}, color={0,127,255}, smooth=Smooth.None )  )  ;;end for ;;)
+                ' + connect  (  heaPorAir, vol.heatPort )  annotation   (  Line  (   point({{-240,0},{20,0},{20,-200},{10,-200}}, color={191,0,0}, smooth=Smooth.None )  )   )
+                ' + connect  (  uSha, convConWin.uSha )  annotation   (  Line  (   point({{-260,200},{0,200},{0,150},{82,150},{82,128},{97.2,128}}, color={0,0,127}, smooth=Smooth.None )  )   )
+                ' + connect  (  convConWin.QRadAbs_flow, QRadAbs_flow )  annotation   (  Line  (   point({{102,109},{102,90},{-260,90}}, color={0,0,127}, smooth=Smooth.None )  )   )
+                ' + connect  (  convConWin.TSha, TSha )  annotation   (  Line  (   point({{108,109},{108,60},{-250,60}}, color={0,0,127}, smooth=Smooth.None )  )   )
+                ' + connect ( conQCon_flow.port, vol.heatPort )  annotation  ( Line ( point({{-200,-100}, {-118,-100},{20,-100},{20,-200},{10,-200}},           color={191,0,0} )  )   )
+                ' + connect ( QCon_flow, conQCon_flow.Q_flow )  annotation  ( Line ( point({{-260,-100},{ -240,-100},{-220,-100}}, color={0,0,127} )  )   )
+                ' + connect  (  QLat_flow, mWat_flow.u )  annotation  ( Line ( point({{-260,-160},{-222,-160}}, color={0,0,127} )  )   )
+                ' + connect ( mWat_flow.y, vol.mWat_flow )  annotation  ( Line ( point({{-199,-160},{-168, -160},{-168,-212},{-30,-212},{-30,-180},{16,-180},{16,-192},{12,-192}}, color={0,0,127} )  )   )
+                ' + connect ( conQLat_flow.Q_flow, QLat_flow )  annotation  ( Line ( point({{-220,-80},{-230, -80},{-230,-160},{-260,-160}}, color={0,0,127} )  )   )
+                ' + connect ( conQLat_flow.port, vol.heatPort )  annotation  ( Line ( point({{-200,-80},{ -96,-80},{20,-80},{20,-200},{10,-200}}, color={191,0,0} )  )   )
+                ' + connect ( vol.C_flow, C_flow )  annotation  ( Line ( point({{12,-206},{16,-206},{16,-220}, {-260,-220}}, color={0,0,127} )  )   )
+            }
+        }
+    }
+
+    package HeatTransfer {
+        package Types {
+            Class InteriorConvection << type >> {
+                Fixed "固定"
+                Temperature "温度依存"
+            }
+            Class ExteriorConvection << type >> {
+                Fixed "固定"
+                TemperatureWind "風速・温度依存"
+            }
+            Class SurfaceRoughness << type >> {
+                VeryRough
+                Rough
+                Medium
+                MediumSmooth
+                Smooth
+                VerySmooth
+            }
+        }
+        package Data {
+            package OpaqueConstructions {
+                ' Class Brick120 << record >> {}
+                ' Class Generic as OGeneric << record >> {
+                Class "Generic" as OpaqueConstructionsGeneric << record >>  {
+                    + << parameter >> nLay: Integer "層の数"
+                    + << parameter >> material[nLay]: Material: 層ごとの材料属性（外から内の順）"
+                    ' + final parameter Real R  {  unit="m2.K/W"  }  =sum  {  material [ i ] .R for i in 1:nLay  }   
+                    ' + final parameter Integer nSta [ nLay ]   {  each min=1  }   = {material [ i ] .nSta for i in 1:nLay} 
+                    + << parameter >> absIR_a: Emissivity "外装面の赤外線吸収率"
+                    + << parameter >> absIR_b: Emissivity "部屋面の赤外線吸収率"
+                    + << parameter >> absSol_a: Emissivity "外装面の日射吸収率"
+                    + << parameter >> absSol_b: Emissivity "部屋面の日射吸収率"
+                    + << parameter >> roughness_a: SurfaceRoughness "外装表面の粗さ"
+                }
+            }
+            package GlazingSystems{
+                ' Class SingleClear3 << record >> {}
+                Class "Generic" as GlazingSystemsGeneric << record >> {
+                    + << parameter >> haveExteriorShade: Boolean "窓外側に影がある場合Trueにする"
+                    + << parameter >> haveInteriorShade: Boolean "窓内側に影がある場合Trueにする"
+                    + << parameter >> glass[:]: Glasses.Generic "層ごとのガラス材料属性（外から内の順）"
+                    + << parameter >> gas[:]: Gases.Generic "層ごとのガラス気体層属性（外から内の順）"
+                    + << parameter >> shade: Shades.Generic "影"
+                    + << parameter >> UFra: CoefficientOfHeatTransfer "枠のU値"
+                    + << parameter >> absIRFra: Emissivity "窓枠の赤外線吸収率"
+                    + << parameter >> absSolFra: Emissivity "窓枠の日射吸収率"
+                    ' + << final parameter >> Boolean haveShade = haveInteriorShade or haveExteriorShade 
+                    ' + << final parameter >> Boolean haveControllableWindow= Modelica.Math.BooleanVectors.anyTrue   {    {size   {   glass [ iGla ] .tauSol, 1  }   > 1 for iGla in 1:size   {   glass,1  }  }  }   
+                }
+            }
+            package Glasses{
+                Class "Generic" as GlassesGeneric << record >> {
+                    + << parameter >> x: Length "厚み"
+                    + << parameter >> k: ThermalConductivity "熱伝導率"
+                    + << parameter >> tauSol[:]: TransmissionCoefficient "日射透過率"
+                    + << parameter >> rhoSol_a[:]: ReflectionCoefficient "表面a（外向き面）の日射反射率"
+                    + << parameter >> rhoSol_b[:]: ReflectionCoefficient "表面b（内向き面）の日射反射率"
+                    + << parameter >> tauIR: TransmissionCoefficient "ガラスの赤外線透過率"
+                    + << parameter >> absIR_a: Emissivity "表面a（外向き面）の赤外線吸収率"
+                    + << parameter >> absIR_b: Emissivity "表面b（内向き面）の赤外線吸収率"
+                }
+            }
+            package Gases {
+                Class "Generic" as GasesGeneric << record >> {
+                    + << parameter >> x: Length "ガス層の厚み"
+                    + << parameter >> a_k: ThermalConductivity "熱伝導率"
+                    + << parameter >> b_k {unit="W/{m.K2}"}: Real "温度依存の熱伝導率"
+                    + << parameter >> a_mu: DynamicViscosity "動粘度"
+                    + << parameter >> b_mu{unit="N.s/{m2.K}"}: Real "温度依存の動粘度"
+                    + << parameter >> a_c: SpecificHeatCapacity "比熱"
+                    + << parameter >> b_c{unit="J/{kg.K2}"}: Real "温度依存の比熱"
+                    + << parameter >> MM: MolarMassl "モル質量（混合・純粋気体）"
+                    + << parameter >> P0: Pressure "定格圧力"
+                }
+            }
+            package Shades {
+                Class "Generic" as ShadesGeneric << record >> {
+                    + << parameter >> tauSol_a: TransmissionCoefficient "日陰面a（室外/内面）の日射透過率"
+                    + << parameter >> tauSol_b: TransmissionCoefficient "日陰面b（ガラス面）の日射透過率"
+                    + << parameter >> rhoSol_a: ReflectionCoefficient "日陰面a（室外/内面）の日射反射率"
+                    + << parameter >> rhoSol_b: ReflectionCoefficient "日陰面b（ガラス面）の日射反射率"
+                    + << parameter >> absIR_a: Emissivity "室外/内面の赤外線吸収率"
+                    + << parameter >> absIR_b: Emissivity "ガラス面の赤外線吸収率"
+                    + << parameter >> tauIR_a: TransmissionCoefficient "室外/内面の赤外線透過率"
+                    + << parameter >> tauIR_b: TransmissionCoefficient "ガラス面の赤外線透過率"
+                }
+            }
+            package BaseClasses {
+                class Material << record >>  {
+                    + << parameter >> x: Length "厚み"
+                    + << parameter >> k: ThermalConductivity "熱伝導率"
+                    + << parameter >> c: SpecificHeatCapacity "比熱"
+                    + << parameter >> d: Density "密度"
+                    + << parameter >> R: m2.K/W "単位面積当たりの熱抵抗"
+                    + << parameter >> nStaRef: Integer "参照材料（0.2mコンクリート）の状態変数の数"
+                    + << parameter >> nSta: Integer "状態変数の数"
+                    + << parameter >> steadyState: Boolean "定常計算かどうか"
+                    + << parameter >> piRef: Real "参照材料のx/sqrt（α）＝温度変化の空間伝播速度"
+                    + << parameter >> piMat: Real "x/sqrt（α）＝温度変化の空間伝播速度"
+                    + << parameter >> nStaReal: Real "状態変数実数"
+                    + << parameter >> TSol: Temperature "PCMにのみ使用される固相線温度"
+                    + << parameter >> TLiq: Temperature "PCMにのみ使用される液相線温度"
+                    + << parameter >> LHea: SpecificInternalEnergy "相変化潜熱"
+                    ' + constant Boolean ensureMonotonicity = false 
+                    ' + constant Boolean phasechange = false 
+                }
+
+            }
+        }
+    }
+}
+
+' PartialAirHeatMassBalance <|---up MixedAir
+
+'AppliedForce af;
+'replaceable model AppliedForce = PartialForce;の形式に治すと
+'replaceable BaseClasses.PartialAirHeatMassBalance air constrainedby BaseClasses.PartialAirHeatMassBalance(
+'は，
+'replaceable model air = PartialAirHeatMassBalance
+'air air;
+'なので，AppliedForceがair, PartialForceがPartialAirHeatMassBalanceである．
+
+'=== MixedAir ===
+RoomHeatMassBalance <|--down MixedAir : "<< redeclare >> \n air → MixedAirHeatMassBalance"
+note right on link
+    redeclare final package Medium = Medium,
+    final energyDynamics=energyDynamics,
+    final massDynamics = energyDynamics,
+    final p_start=p_start,
+    final T_start=T_start,
+    final X_start=X_start,
+    final C_start=C_start,
+    final C_nominal=C_nominal,
+    final mSenFac=mSenFac,
+    final m_flow_nominal=m_flow_nominal,
+    final homotopyInitialization=homotopyInitialization,
+    final conMod=intConMod,
+    final hFixed=hIntFixed,
+    final use_C_flow = use_C_flow),
+    datConExt(each T_a_start = T_start,each T_b_start = T_start),
+    datConExtWin(each T_a_start = T_start,each T_b_start = T_start),
+    datConBou(each T_a_start = T_start,each T_b_start = T_start),
+    datConPar(each T_a_start = T_start,each T_b_start = T_start)
+end note
+
+MixedAirHeatMassBalance <--down MixedAir
+' : "<< redeclare >> \n air → MixedAirHeatMassBalance"
+Modelica.Media.Interfaces.PartialMedium <|..--down "Medium" MixedAir
+' Dynamics -down--* "energyDynamics" MixedAir
+' RealInput -down--* "uSha[nConExtWin]" MixedAir
+' RealInput -down--* "C_flow[Medium.nC]" MixedAir
+
+'=== RoomHeatMassBalance ===
+PartialAirHeatMassBalance <|..-down RoomHeatMassBalance : "air\n<< redeclare >>\nMedium→Medium"
+'redeclare Buildings.ThermalZones.Detailed.BaseClasses.MixedAirHeatMassBalance air{final energyDynamics=energyDynamics, final massDynamics = energyDynamics, final p_start=p_start, final T_start=T_start, final X_start=X_start, final C_start=C_start, final C_nominal=C_nominal, final mSenFac=mSenFac, final m_flow_nominal=m_flow_nominal, final homotopyInitialization=homotopyInitialization, final conMod=intConMod, final hFixed=hIntFixed, final use_C_flow = use_C_flow  },
+'datConExt{each T_a_start = T_start, each T_b_start = T_start  },
+'datConExtWin{each T_a_start = T_start, each T_b_start = T_start},
+'datConBou{each T_a_start = T_start, each T_b_start = T_start},
+'datConPar{each T_a_start = T_start, each T_b_start = T_start}}  
+note right on link
+    redeclare final package Medium = Medium,
+    nPorts=nPorts,
+    final nConExt=nConExt,
+    final nConExtWin=nConExtWin,
+    final nConPar=nConPar,
+    final nConBou=nConBou,
+    final nSurBou=nSurBou,
+    final datConExt=datConExt,
+    final datConExtWin=datConExtWin,
+    final datConPar=datConPar,
+    final datConBou=datConBou,
+    final surBou=surBou,
+    final haveShade=haveShade,
+    final V=V
+end note
+ConstructionRecords <|---down RoomHeatMassBalance
+Modelica.Media.Interfaces.PartialMedium <|..--down "Medium"RoomHeatMassBalance
+Modelica.Media.Interfaces.PartialMedium <---down RoomHeatMassBalance
+
+' VesselFluidPorts_b -down--* "ports[nPorts]"RoomHeatMassBalance
+' Area -down--* "AFlo"RoomHeatMassBalance
+' Length -down--* "hRoo"RoomHeatMassBalance
+' HeatPort_a -down--* "heaPorAir"RoomHeatMassBalance
+' HeatPort_a -down--* "heaPorRad"RoomHeatMassBalance
+Construction -down--* "conExt[NConExt]"RoomHeatMassBalance
+ConstructionWithWindow -down--* "conExtWin[NConExtWin]"RoomHeatMassBalance
+Construction -down--* "conPar[NConPar]"RoomHeatMassBalance
+Construction -down--* "conBou[NConBou]"RoomHeatMassBalance
+Buildings.HeatTransfer.Types.InteriorConvection -down--* "intConMod"RoomHeatMassBalance
+' CoefficientOfHeatTransfer -down--* "hIntFixed"RoomHeatMassBalance
+ExteriorConvection -down--* "extConMod"RoomHeatMassBalance
+' CoefficientOfHeatTransfer -down--* "hExtFixed"RoomHeatMassBalance
+' MassFlowRate -down--* "m_flow_nominal"RoomHeatMassBalance
+' RealInput -down--* "uWin[nConExtWin]"RoomHeatMassBalance
+' HeatPort_a -down--* "surf_conBou[nConBou]"RoomHeatMassBalance
+' HeatPort_a -down--* "surf_surBou[nSurBou]"RoomHeatMassBalance
+' RealInput -down--* "qGai_flow[3]"RoomHeatMassBalance
+Buildings.ThermalZones.Detailed.BaseClasses.ExteriorBoundaryConditions -down-* "bouConExt"RoomHeatMassBalance
+Buildings.ThermalZones.Detailed.BaseClasses.ExteriorBoundaryConditionsWithWindow -down-* "bouConExtWin"RoomHeatMassBalance
+Buildings.HeatTransfer.Windows.BaseClasses.WindowRadiation -down--* "conExtWinRad[NConExtWin]"RoomHeatMassBalance
+Buildings.BoundaryConditions.WeatherData.Bus -down--* "weaBus"RoomHeatMassBalance
+Buildings.ThermalZones.Detailed.BaseClasses.SolarRadiationExchange -down-* "solRadExc"RoomHeatMassBalance
+Buildings.ThermalZones.Detailed.BaseClasses.InfraredRadiationGainDistribution -down-* "irRadGai"RoomHeatMassBalance
+Buildings.ThermalZones.Detailed.BaseClasses.InfraredRadiationExchange -down-* "irRadExc"RoomHeatMassBalance
+Buildings.ThermalZones.Detailed.BaseClasses.RadiationTemperature -down-* "radTem"RoomHeatMassBalance
+Buildings.HeatTransfer.Windows.BaseClasses.ShadeRadiation -down--* "shaRad[NConExtWin]"RoomHeatMassBalance
+Buildings.ThermalZones.Detailed.BaseClasses.HeatGain -down--* "heaGai"RoomHeatMassBalance
+Buildings.ThermalZones.Detailed.BaseClasses.RadiationAdapter -down--* "radiationAdapter"RoomHeatMassBalance
+' Add -down--* "add"RoomHeatMassBalance
+' Add -down--* "sumJToWin[NConExtWin]"RoomHeatMassBalance
+' Sum -down--* "sumJFroWin[NConExtWin]"RoomHeatMassBalance
+' PrescribedTemperature -down--* "TSha[NConExtWin]"RoomHeatMassBalance
+
+
+
+'=== ConstructionRecords ===
+ConstructionNumbers <|--down ConstructionRecords
+ParameterConstructionWithWindow -down--* "datConExtWin[NConExtWin]" ConstructionRecords
+ParameterConstruction -down--* "datConExt[NConExt]" ConstructionRecords
+ParameterConstruction -down--* "datConPar[NConPar]" ConstructionRecords
+ParameterConstruction -down--* "datConBou[NConBou]" ConstructionRecords
+OpaqueSurface -down--* "surBou[NSurBou]" ConstructionRecords
+' Brick120 -down--* "dummyCon" ConstructionRecords
+' SingleClear3 -down--* "dummyGlaSys" ConstructionRecords
+
+'=== PartialAirHeatMassBalance ===
+ConstructionRecords <|---down PartialAirHeatMassBalance
+Modelica.Media.Interfaces.PartialMedium <|..-down "Medium" PartialAirHeatMassBalance
+' Modelica.Media.Interfaces.PartialMedium <---down PartialAirHeatMassBalance
+' Volume -down--* "V" PartialAirHeatMassBalance
+' RealInput -down--* "uSha,QRadAbs_flow,QCon_flow,QLat_flow" PartialAirHeatMassBalance
+' RealInput -down--* "uSha[NConExtWin]"PartialAirHeatMassBalance
+' RealInput -down--* "QRadAbs_flow[NConExtWin]"PartialAirHeatMassBalance
+' RealInput -down--* "QCon_flow"PartialAirHeatMassBalance
+' RealInput -down--* "QLat_flow"PartialAirHeatMassBalance
+' RealOutput -down--* "TSha[NConExtWin]" PartialAirHeatMassBalance
+' VesselFluidPorts_b -down--* "ports[nPorts]" PartialAirHeatMassBalance
+' HeatPort_a -down--* "Many" PartialAirHeatMassBalance
+' HeatPort_a -down--* "heaPorAir"PartialAirHeatMassBalance
+' HeatPort_a -down--* "conExt[NConExt]"PartialAirHeatMassBalance
+' HeatPort_a -down--* "conExtWin[NConExtWin]"PartialAirHeatMassBalance
+' HeatPort_a -down--* "glaUns[NConExtWin]"PartialAirHeatMassBalance
+' HeatPort_a -down--* "glaSha[NConExtWin]"PartialAirHeatMassBalance
+' HeatPort_a -down--* "conExtWinFra[NConExtWin]"PartialAirHeatMassBalance
+' HeatPort_a -down--* "conPar_a[NConPar]"PartialAirHeatMassBalance
+' HeatPort_a -down--* "conPar_b[NConPar]"PartialAirHeatMassBalance
+' HeatPort_a -down--* "conBou[NConBou]"PartialAirHeatMassBalance
+' HeatPort_a -down--* "conSurBou[NSurBou]"PartialAirHeatMassBalance
+
+'=== MixedAirHeatMassBalance ===
+PartialAirHeatMassBalance <|---down MixedAirHeatMassBalance
+Buildings.Fluid.Interfaces.LumpedVolumeDeclarations <|---down MixedAirHeatMassBalance
+' MassFlowRate -down--* "m_flow_nominal"MixedAirHeatMassBalance
+Fluid.MixingVolumes.MixingVolumeMoistAir -down--* "vol"MixedAirHeatMassBalance : "<< redeclare >> \n Medium → Medium"
+Buildings.HeatTransfer.Types.InteriorConvection -down-* "conMod"MixedAirHeatMassBalance
+' CoefficientOfHeatTransfer -down--* "hFixed"MixedAirHeatMassBalance
+' RealInput -down--* "C_flow[Medium.nC]"MixedAirHeatMassBalance
+' Gain -down--* "mWat_flow"MixedAirHeatMassBalance
+' ThermalCollector -down--* "theConConExt"MixedAirHeatMassBalance
+' ThermalCollector -down--* "theConConExtWin"MixedAirHeatMassBalance
+' ThermalCollector -down--* "theConConWin"MixedAirHeatMassBalance
+' ThermalCollector -down--* "theConConPar_a"MixedAirHeatMassBalance
+' ThermalCollector -down--* "theConConPar_b"MixedAirHeatMassBalance
+' ThermalCollector -down--* "theConConBou"MixedAirHeatMassBalance
+' ThermalCollector -down--* "theConSurBou"MixedAirHeatMassBalance
+
+'=== ParameterConstruction ===
+PartialParameterConstruction <|--down ParameterConstruction
+
+'=== ParameterConstructionWithWindow ===
+PartialParameterConstruction <|---down ParameterConstructionWithWindow
+' Area -down--* "A" ParameterConstructionWithWindow
+' Length -down--* "hWin" ParameterConstructionWithWindow
+' Length -down--* "wWin" ParameterConstructionWithWindow
+Overhang -down-* "ove" ParameterConstructionWithWindow
+SideFins -down-* "sidFin" ParameterConstructionWithWindow
+GlazingSystemsGeneric -down-* "glaSys" ParameterConstructionWithWindow
+
+'=== PartialParameterConstruction ===
+OpaqueConstructionsGeneric -down-* "layers" PartialParameterConstruction
+CFDBoundaryConditions -down--* "boundaryCondition" PartialParameterConstruction
+
+'=== OpaqueSurface ===
+OpaqueConstructionsGeneric <|-down OpaqueSurface
+CFDBoundaryConditions -down--* "boundaryCondition"OpaqueSurface
+
+'=== SideFins ===
+' Record <|---down SideFins
+' Length -down--* "h"SideFins
+' Length -down--* "dep"SideFins
+' Length -down--* "gap"SideFins
+
+'=== Brick120 ===
+' OpaqueConstructionsGeneric <|---down Brick120
+
+'=== Construction ===
+PartialConstruction <|---down "final AOpa = A" Construction
+
+'=== ConstructionWithWindow ===
+PartialConstruction <|---down "final AOpa = A - AWin"ConstructionWithWindow
+' Area -down--* "AWin"ConstructionWithWindow
+' parameter <|..-down "HeatTransfer.Data.GlazingSystems.Generic" ConstructionWithWindow
+GlazingSystemsGeneric <|..-down "glaSys" ConstructionWithWindow
+' HeatPort_a -down--* "glaUns_a"ConstructionWithWindow
+' HeatPort_a -down--* "glaSha_a"ConstructionWithWindow
+' HeatPort_a -down--* "fra_a"ConstructionWithWindow
+' RealInput -down--* "uSha"ConstructionWithWindow
+' HeatPort_b -down--* "glaUns_b"ConstructionWithWindow
+' HeatPort_b -down--* "glaSha_b"ConstructionWithWindow
+' HeatPort_b -down--* "fra_b"ConstructionWithWindow
+' RealInput -down--* "QAbsUns_flow[size"ConstructionWithWindow
+' RealInput -down--* "QAbsSha_flow[size"ConstructionWithWindow
+
+'=== GlazingSystemsGeneric ===
+GlassesGeneric -down-* "glass[]"GlazingSystemsGeneric
+GasesGeneric -down-* "gas[]"GlazingSystemsGeneric
+ShadesGeneric -down-* "shade"GlazingSystemsGeneric
+
+'===OpaqueConstructionsGeneric===
+' package -down--* "OpaqueConstructions"OpaqueConstructions
+' MaterialPropertiesPackage <|---up OpaqueConstructions
+Material -down--* "material[nLay]"OpaqueConstructionsGeneric
+' Emissivity -down--* "absIR_a"OpaqueConstructionsGeneric
+' Emissivity -down--* "absIR_b"OpaqueConstructionsGeneric
+' Emissivity -down--* "absSol_a"OpaqueConstructionsGeneric
+' Emissivity -down--* "absSol_b"OpaqueConstructionsGeneric
+SurfaceRoughness -down--* "roughness_a"OpaqueConstructionsGeneric
+
+
+@enduml
