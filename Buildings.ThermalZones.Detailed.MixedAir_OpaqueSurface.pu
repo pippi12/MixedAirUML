@@ -1,0 +1,98 @@
+@startuml MixedAir
+hide circle
+skinparam {
+    defaultFontName "Noto Sans JP"
+}
+
+package Buildings{
+    package ThermalZones.Detailed{
+        ' package Types{
+        '     Class CFDBoundaryConditions << type >> {
+        '     }
+        ' }
+        package BaseClasses {
+            class ConstructionRecords << record >>  {
+                + << parameter >> datConExt[NConExt]: ParameterConstruction "窓のない外装のパラメータ"
+                + << parameter >> datConExtWin[NConExtWin]: ParameterConstructionWithWindow "窓のある外装のパラメータ"
+                + << parameter >> datConPar[NConPar]: ParameterConstruction "空間内の間仕切りのパラメータ"
+                + << parameter >> datConBou[NConBou]: ParameterConstruction "空間外との境界構造体のパラメータ"
+                + << parameter >> surBou[NSurBou]: OpaqueSurface "熱伝導が空間外でモデル化された不透明な面のパラメータ"
+                + << parameter >> dummyCon: Brick120 "上書きされるので無視してよい"
+                + << parameter >> dummyGlaSys: SingleClear3 "上書きされるので無視してよい"
+            }
+
+            Class OpaqueSurface << record >> {
+                + << parameter >> name: String name "面の名前（MixedAirでは任意）"
+                + << parameter >> boundaryCondition: CFDBoundaryConditions "不使用（CFDモデルの時に使用される）"
+
+            }
+        }
+    }
+
+    package HeatTransfer {
+        package Types {
+            Class SurfaceRoughness << type >> {
+                VeryRough
+                Rough
+                Medium
+                MediumSmooth
+                Smooth
+                VerySmooth
+            }
+        }
+        package Data {
+            package OpaqueConstructions {
+                ' Class Brick120 << record >> {}
+                ' Class Generic as OGeneric << record >> {
+                Class "Generic" as OpaqueConstructionsGeneric << record >>  {
+                    + << parameter >> nLay: Integer "層の数"
+                    + << parameter >> material[nLay]: Material: 層ごとの材料属性（外から内の順）"
+                    ' + final parameter Real R  {  unit="m2.K/W"  }  =sum  {  material [ i ] .R for i in 1:nLay  }   
+                    ' + final parameter Integer nSta [ nLay ]   {  each min=1  }   = {material [ i ] .nSta for i in 1:nLay} 
+                    + << parameter >> absIR_a: Emissivity "外装面の赤外線吸収率"
+                    + << parameter >> absIR_b: Emissivity "部屋面の赤外線吸収率"
+                    + << parameter >> absSol_a: Emissivity "外装面の日射吸収率"
+                    + << parameter >> absSol_b: Emissivity "部屋面の日射吸収率"
+                    + << parameter >> roughness_a: SurfaceRoughness "外装表面の粗さ"
+                }
+            }
+            package BaseClasses {
+                class Material << record >>  {
+                    + << parameter >> x: Length "厚み"
+                    + << parameter >> k: ThermalConductivity "熱伝導率"
+                    + << parameter >> c: SpecificHeatCapacity "比熱"
+                    + << parameter >> d: Density "密度"
+                    + << parameter >> R: m2.K/W "単位面積当たりの熱抵抗"
+                    + << parameter >> nStaRef: Integer "参照材料（0.2mコンクリート）の状態変数の数"
+                    + << parameter >> nSta: Integer "状態変数の数"
+                    + << parameter >> steadyState: Boolean "定常計算かどうか"
+                    + << parameter >> piRef: Real "参照材料のx/sqrt（α）＝温度変化の空間伝播速度"
+                    + << parameter >> piMat: Real "x/sqrt（α）＝温度変化の空間伝播速度"
+                    + << parameter >> nStaReal: Real "状態変数実数"
+                    + << parameter >> TSol: Temperature "PCMにのみ使用される固相線温度"
+                    + << parameter >> TLiq: Temperature "PCMにのみ使用される液相線温度"
+                    + << parameter >> LHea: SpecificInternalEnergy "相変化潜熱"
+                    ' + constant Boolean ensureMonotonicity = false 
+                    ' + constant Boolean phasechange = false 
+                }
+
+            }
+        }
+    }
+}
+
+'=== ConstructionRecords ===
+OpaqueSurface -down-* "surBou[NSurBou]" ConstructionRecords
+
+'=== OpaqueSurface ===
+OpaqueConstructionsGeneric <|--down OpaqueSurface
+' CFDBoundaryConditions -down-* "boundaryCondition"OpaqueSurface
+
+'===OpaqueConstructionsGeneric===
+Material -down-* "material[nLay]"OpaqueConstructionsGeneric
+SurfaceRoughness -down-* "roughness_a"OpaqueConstructionsGeneric
+
+
+
+
+@enduml

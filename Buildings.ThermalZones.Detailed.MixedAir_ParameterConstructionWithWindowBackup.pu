@@ -1,0 +1,258 @@
+@startuml MixedAir
+hide circle
+skinparam {
+    defaultFontName "Noto Sans JP"
+}
+
+package Buildings{
+    package ThermalZones.Detailed{
+        package Types{
+            Class CFDBoundaryConditions << type >> {
+            }
+        }
+        package BaseClasses {
+            Class Overhang << record >> {
+                + << parameter >> wL: Length "窓に対して左側のオーバーハング幅"
+                + << parameter >> wR: Length "窓に対して右側のオーバーハング幅"
+                + << parameter >> dep: Length "壁からの深さ"
+                + << parameter >> gap: Length "窓の上端からの距離"
+                ' + << final parameter >> haveOverhang: Boolean
+            }
+            Class SideFins << record >> {
+                + << parameter >> h: Length "窓の上端から上方向の高さ"
+                + << parameter >> dep: Length "壁からの深さ"
+                + << parameter >> gap: Length "窓の端からの距離"
+                ' + << final parameter >> haveSideFins: Boolean
+            }
+        }
+        package BaseClasses {
+            class ConstructionRecords << record >>  {
+                + << parameter >> datConExt[NConExt]: ParameterConstruction "窓のない外装のパラメータ"
+                + << parameter >> datConExtWin[NConExtWin]: ParameterConstructionWithWindow "窓のある外装のパラメータ"
+                + << parameter >> datConPar[NConPar]: ParameterConstruction "空間内の間仕切りのパラメータ"
+                + << parameter >> datConBou[NConBou]: ParameterConstruction "空間外との境界構造体のパラメータ"
+                + << parameter >> surBou[NSurBou]: OpaqueSurface "熱伝導が空間外でモデル化された不透明な面のパラメータ"
+                + << parameter >> dummyCon: Brick120 "上書きされるので無視してよい"
+                + << parameter >> dummyGlaSys: SingleClear3 "上書きされるので無視してよい"
+            }
+
+            Class ConstructionNumbers << record >> {
+                + << parameter >> nConExt: Integer "窓のない外装の数"
+                + << parameter >> nConExtWin: Integer  "窓のある外装の数"
+                + << parameter >> nConPar: Integer "空間内の間仕切りの数"
+                + << parameter >> nConBou: Integer "空間外との境界構造体の数"
+                + << parameter >> nSurBou: Integer "熱伝導が空間外でモデル化された不透明な面の数"
+                ' + << final parameter >> NConExt{min=1}=max{1, nConExt}: Integer
+                ' + << final parameter >> NConExtWin{min=1}=max{1, nConExtWin}: Integer
+                ' + << final parameter >> NConPar{min=1}=max{1, nConPar}: Integer
+                ' + << final parameter >> NConBou{min=1}=max{1, nConBou}: Integer
+                ' + << final parameter >> NSurBou{min=1}=max{1, nSurBou}: Integer
+                ' + << final parameter >> haveConExt = nConExt > 0: Boolean
+                ' + << final parameter >> haveConExtWin = nConExtWin > 0: Boolean
+                ' + << final parameter >> haveConPar = nConPar > 0: Boolean
+                ' + << final parameter >> haveConBou = nConBou > 0: Boolean
+                ' + << final parameter >> haveSurBou = nSurBou > 0: Boolean
+            }
+            together {
+                Class ParameterConstruction << record >> {
+                    + << parameter >> A: Area "構造体表面の面積"
+                }
+                Class ParameterConstructionWithWindow << record >> {
+                    + << parameter >> A: Area "構造体表面の面積（窓＋不透明な構造体）"
+                    + << parameter >> hWin: Length "窓の高さ"
+                    + << parameter >> wWin: Length "窓の幅"
+                    ' + << final parameter >> AWin: Area
+                    ' + << final parameter >> AOpa: Area
+                    + << parameter >> fFra: Real "窓の総面積に対する窓枠の面積の割合"
+                    + << parameter >> ove: Overhang "窓のひさしの形状"
+                    + << parameter >> sidFin{h=0, dep=0, gap=0}: SideFins "窓の側面の出っ張りの形状"
+                    ' + << final parameter >> AFra=fFra*AWin: Area
+                    ' + << final parameter >> AGla=AWin - AFra: Area
+                    + << parameter >> glaSys: GlazingSystems.Generic "窓の材料属性"
+                    ' + << final parameter >> haveOverhangOrSideFins: Boolean
+                }
+            }
+            class PartialParameterConstruction << record >> {
+                + << parameter >> name: String "面の名前（MixedAirでは任意）"
+                + << parameter >> layers: OpaqueConstructions.Generic "不透明な構造体の材料属性"
+                + << parameter >> til: Angle "チルト（壁なら90度）"
+                + << parameter >> azi: Angle "アジマス角（壁なら向いている方角で決まる）"
+                ' + << final parameter >> is_floor=til > 2.74889125 and til < 3.53428875: Boolean
+                ' + << final parameter >> is_ceiling=til > -0.392699 and til < 0.392699: Boolean
+                + << parameter >> steadyStateInitial: Boolean "温度の初期値を与える場合はFalse"
+                + << parameter >> T_a_start: Temperature "ポートA（外？）の初期温度（MixedAirにてMediumの初期温度になる）"
+                + << parameter >> T_b_start: Temperature "ポートB（内？）の初期温度（MixedAirにてMediumの初期温度になる）"
+                + << parameter >> stateAtSurface_a: Boolean "？？？"
+                + << parameter >> stateAtSurface_b: Boolean "？？？"
+                + << parameter >> boundaryCondition: CFDBoundaryConditions "不使用（CFDモデルの時に使用される）"
+            }
+            Class OpaqueSurface << record >> {
+                + << parameter >> name: String name "面の名前（MixedAirでは任意）"
+                + << parameter >> boundaryCondition: CFDBoundaryConditions "不使用（CFDモデルの時に使用される）"
+
+            }
+        }
+    }
+
+    package HeatTransfer {
+        package Types {
+            ' Class InteriorConvection << type >> {
+            '     Fixed "固定"
+            '     Temperature "温度依存"
+            ' }
+            ' Class ExteriorConvection << type >> {
+            '     Fixed "固定"
+            '     TemperatureWind "風速・温度依存"
+            ' }
+            Class SurfaceRoughness << type >> {
+                VeryRough
+                Rough
+                Medium
+                MediumSmooth
+                Smooth
+                VerySmooth
+            }
+        }
+        package Data {
+            package OpaqueConstructions {
+                ' Class Brick120 << record >> {}
+                ' Class Generic as OGeneric << record >> {
+                Class "Generic" as OpaqueConstructionsGeneric << record >>  {
+                    + << parameter >> nLay: Integer "層の数"
+                    + << parameter >> material[nLay]: Material: 層ごとの材料属性（外から内の順）"
+                    ' + final parameter Real R  {  unit="m2.K/W"  }  =sum  {  material [ i ] .R for i in 1:nLay  }   
+                    ' + final parameter Integer nSta [ nLay ]   {  each min=1  }   = {material [ i ] .nSta for i in 1:nLay} 
+                    + << parameter >> absIR_a: Emissivity "外装面の赤外線吸収率"
+                    + << parameter >> absIR_b: Emissivity "部屋面の赤外線吸収率"
+                    + << parameter >> absSol_a: Emissivity "外装面の日射吸収率"
+                    + << parameter >> absSol_b: Emissivity "部屋面の日射吸収率"
+                    + << parameter >> roughness_a: SurfaceRoughness "外装表面の粗さ"
+                }
+            }
+            package GlazingSystems{
+                ' Class SingleClear3 << record >> {}
+                Class "Generic" as GlazingSystemsGeneric << record >> {
+                    + << parameter >> haveExteriorShade: Boolean "窓外側に影がある場合Trueにする"
+                    + << parameter >> haveInteriorShade: Boolean "窓内側に影がある場合Trueにする"
+                    + << parameter >> glass[:]: Glasses.Generic "層ごとのガラス材料属性（外から内の順）"
+                    + << parameter >> gas[:]: Gases.Generic "層ごとのガラス気体層属性（外から内の順）"
+                    + << parameter >> shade: Shades.Generic "影"
+                    + << parameter >> UFra: CoefficientOfHeatTransfer "枠のU値"
+                    + << parameter >> absIRFra: Emissivity "窓枠の赤外線吸収率"
+                    + << parameter >> absSolFra: Emissivity "窓枠の日射吸収率"
+                    ' + << final parameter >> Boolean haveShade = haveInteriorShade or haveExteriorShade 
+                    ' + << final parameter >> Boolean haveControllableWindow= Modelica.Math.BooleanVectors.anyTrue   {    {size   {   glass [ iGla ] .tauSol, 1  }   > 1 for iGla in 1:size   {   glass,1  }  }  }   
+                }
+            }
+            package Glasses{
+                Class "Generic" as GlassesGeneric << record >> {
+                    + << parameter >> x: Length "厚み"
+                    + << parameter >> k: ThermalConductivity "熱伝導率"
+                    + << parameter >> tauSol[:]: TransmissionCoefficient "日射透過率"
+                    + << parameter >> rhoSol_a[:]: ReflectionCoefficient "表面a（外向き面）の日射反射率"
+                    + << parameter >> rhoSol_b[:]: ReflectionCoefficient "表面b（内向き面）の日射反射率"
+                    + << parameter >> tauIR: TransmissionCoefficient "ガラスの赤外線透過率"
+                    + << parameter >> absIR_a: Emissivity "表面a（外向き面）の赤外線吸収率"
+                    + << parameter >> absIR_b: Emissivity "表面b（内向き面）の赤外線吸収率"
+                }
+            }
+            package Gases {
+                Class "Generic" as GasesGeneric << record >> {
+                    + << parameter >> x: Length "ガス層の厚み"
+                    + << parameter >> a_k: ThermalConductivity "熱伝導率"
+                    + << parameter >> b_k {unit="W/{m.K2}"}: Real "温度依存の熱伝導率"
+                    + << parameter >> a_mu: DynamicViscosity "動粘度"
+                    + << parameter >> b_mu{unit="N.s/{m2.K}"}: Real "温度依存の動粘度"
+                    + << parameter >> a_c: SpecificHeatCapacity "比熱"
+                    + << parameter >> b_c{unit="J/{kg.K2}"}: Real "温度依存の比熱"
+                    + << parameter >> MM: MolarMassl "モル質量（混合・純粋気体）"
+                    + << parameter >> P0: Pressure "定格圧力"
+                }
+            }
+            package Shades {
+                Class "Generic" as ShadesGeneric << record >> {
+                    + << parameter >> tauSol_a: TransmissionCoefficient "日陰面a（室外/内面）の日射透過率"
+                    + << parameter >> tauSol_b: TransmissionCoefficient "日陰面b（ガラス面）の日射透過率"
+                    + << parameter >> rhoSol_a: ReflectionCoefficient "日陰面a（室外/内面）の日射反射率"
+                    + << parameter >> rhoSol_b: ReflectionCoefficient "日陰面b（ガラス面）の日射反射率"
+                    + << parameter >> absIR_a: Emissivity "室外/内面の赤外線吸収率"
+                    + << parameter >> absIR_b: Emissivity "ガラス面の赤外線吸収率"
+                    + << parameter >> tauIR_a: TransmissionCoefficient "室外/内面の赤外線透過率"
+                    + << parameter >> tauIR_b: TransmissionCoefficient "ガラス面の赤外線透過率"
+                }
+            }
+            package BaseClasses {
+                class Material << record >>  {
+                    + << parameter >> x: Length "厚み"
+                    + << parameter >> k: ThermalConductivity "熱伝導率"
+                    + << parameter >> c: SpecificHeatCapacity "比熱"
+                    + << parameter >> d: Density "密度"
+                    + << parameter >> R: m2.K/W "単位面積当たりの熱抵抗"
+                    + << parameter >> nStaRef: Integer "参照材料（0.2mコンクリート）の状態変数の数"
+                    + << parameter >> nSta: Integer "状態変数の数"
+                    + << parameter >> steadyState: Boolean "定常計算かどうか"
+                    + << parameter >> piRef: Real "参照材料のx/sqrt（α）＝温度変化の空間伝播速度"
+                    + << parameter >> piMat: Real "x/sqrt（α）＝温度変化の空間伝播速度"
+                    + << parameter >> nStaReal: Real "状態変数実数"
+                    + << parameter >> TSol: Temperature "PCMにのみ使用される固相線温度"
+                    + << parameter >> TLiq: Temperature "PCMにのみ使用される液相線温度"
+                    + << parameter >> LHea: SpecificInternalEnergy "相変化潜熱"
+                    ' + constant Boolean ensureMonotonicity = false 
+                    ' + constant Boolean phasechange = false 
+                }
+
+            }
+        }
+    }
+}
+
+'=== ConstructionRecords ===
+ConstructionNumbers <|--down ConstructionRecords
+ParameterConstructionWithWindow -down--* "datConExtWin[NConExtWin]" ConstructionRecords
+ParameterConstruction -down--* "datConExt[NConExt]" ConstructionRecords
+ParameterConstruction -down--* "datConPar[NConPar]" ConstructionRecords
+ParameterConstruction -down--* "datConBou[NConBou]" ConstructionRecords
+OpaqueSurface -down--* "surBou[NSurBou]" ConstructionRecords
+' Brick120 -down--* "dummyCon" ConstructionRecords
+' SingleClear3 -down--* "dummyGlaSys" ConstructionRecords
+
+
+'=== ParameterConstruction ===
+PartialParameterConstruction <|--down ParameterConstruction
+
+'=== ParameterConstructionWithWindow ===
+PartialParameterConstruction <|---down ParameterConstructionWithWindow
+' Area -down--* "A" ParameterConstructionWithWindow
+' Length -down--* "hWin" ParameterConstructionWithWindow
+' Length -down--* "wWin" ParameterConstructionWithWindow
+Overhang -down-* "ove" ParameterConstructionWithWindow
+SideFins -down-* "sidFin" ParameterConstructionWithWindow
+GlazingSystemsGeneric -down-* "glaSys" ParameterConstructionWithWindow
+
+'=== PartialParameterConstruction ===
+OpaqueConstructionsGeneric -down-* "layers" PartialParameterConstruction
+CFDBoundaryConditions -down-* "boundaryCondition" PartialParameterConstruction
+
+'=== OpaqueSurface ===
+OpaqueConstructionsGeneric <|-down OpaqueSurface
+CFDBoundaryConditions -down--* "boundaryCondition"OpaqueSurface
+
+'=== SideFins ===
+' Record <|---down SideFins
+' Length -down--* "h"SideFins
+' Length -down--* "dep"SideFins
+' Length -down--* "gap"SideFins
+
+'=== GlazingSystemsGeneric ===
+GlassesGeneric -down-* "glass[]"GlazingSystemsGeneric
+GasesGeneric -down-* "gas[]"GlazingSystemsGeneric
+ShadesGeneric -down-* "shade"GlazingSystemsGeneric
+
+'===OpaqueConstructionsGeneric===
+Material -down--* "material[nLay]"OpaqueConstructionsGeneric
+SurfaceRoughness -down--* "roughness_a"OpaqueConstructionsGeneric
+
+
+
+
+@enduml

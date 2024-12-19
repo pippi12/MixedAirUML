@@ -1,6 +1,18 @@
-@startuml
+@startuml MixedAir
 hide circle
-skinparam font Arial
+skinparam {
+    ' defaultFontName "Helvetica Neue, メイリオ" 
+    ' defaultFontName Consolas,メイリオ
+    ' defaultFontName "Arial, 'Noto Sans JP Thin'"
+    ' defaultFontName "Arial"
+    defaultFontName "Noto Sans JP"
+    ' defaultFontName "Yu Gothic UI"
+}
+' skinparam defaultFontName Noto Sans CJK JP Black Regular
+',Helvetica,Arial,sans-serif"
+' skinparam defaultFontName "Arial, Yu Gothic UI"
+' skinparam DefaultFontName Arial
+' #skinparam font Arial Yo Gothic
 
 package Modelica {
     ' package Blocks {
@@ -54,18 +66,341 @@ package Buildings{
                 + << parameter >> gap: Length "窓の上端からの距離"
                 ' + << final parameter >> haveOverhang: Boolean
             }
-            class SideFins << record >> {
+            Class SideFins << record >> {
                 + << parameter >> h: Length "窓の上端から上方向の高さ"
                 + << parameter >> dep: Length "壁からの深さ"
                 + << parameter >> gap: Length "窓の端からの距離"
                 ' + << final parameter >> haveSideFins: Boolean
+            }
+            Class RadiationTemperature << model >>  {
+                + << parameter >> Boolean haveShade
+                ' + Modelica.Blocks.Interfaces.RealInput uSha [ NConExtWin ]   {  each min=0, each max=1  }   if haveShade 
+                ' + Modelica.Blocks.Interfaces.RealOutput TRad  {  min=0, unit="K", displayUnit=
+                ' # final parameter Integer NOpa = NConExt+2*NConExtWin+2*NConPar+NConBou+NSurBou 
+                ' # final parameter Integer NWin = NConExtWin 
+                ' # final parameter Integer NTot = NOpa + NWin 
+                ' # final parameter Modelica.Units.SI.Area AGla [ NWin ] =datConExtWin.AGla 
+                ' # final parameter Real epsGla [ NWin ]   {  each min=0, each max=1  }  = {datConExtWin [ i ] .glaSys.glass [ size   {   datConExtWin [ i ] .glaSys.glass, 1  }   ] .absIR_b for i in 1:NWin} 
+                ' # final parameter Real epsSha [ NWin ]   {  each min=0, each max=1  }  = {datConExtWin [ i ] .glaSys.shade.absIR_a for i in 1:NWin} 
+                ' # final parameter Real tauSha [ NWin ]   {  each min=0, each max=1  }  = {   {   if datConExtWin [ i ] .glaSys.haveInteriorShade then datConExtWin [ i ] .glaSys.shade.tauIR_a else 1   }    for i in 1:NWin} 
+                ' # final parameter Modelica.Units.SI.Area epsAOpa [ NOpa ]   {  each fixed=false  }   
+                ' # final parameter Modelica.Units.SI.Area epsAGla [ NWin ]   {  each fixed=false  }   
+                ' # final parameter Modelica.Units.SI.Area epsASha [ NWin ]   {  each fixed=false  }   
+                ' # final parameter Modelica.Units.SI.Area epsTauASha [ NWin ]   {  each fixed=false  }   
+                ' # Modelica.Blocks.Interfaces.RealInput uSha_internal [ NConExtWin ]   {  each min=0, each max=1  }   
+                ' # (for i in 1:NConExt loop epsAOpa[i] = epsConExt[i] * AConExt[i;end for ;;)
+                ' # (for i in 1:NConPar loop epsAOpa[i+NConExt]         = epsConPar_a[i] * AConPar[i] ;;epsAOpa[i+NConExt+NConPar] = epsConPar_b[i] * AConPar[i] ;;end for ;;)
+                ' # (for i in 1:NConBou loop epsAOpa[i+NConExt+2*NConPar] = epsConBou[i] * AConBou[i] ;;end for ;;)
+                ' # (for i in 1:NSurBou loop epsAOpa[i+NConExt+2*NConPar+NConBou] = epsSurBou[i] * ASurBou[i] ;;end for ;;)
+                ' # (for i in 1:NConExtWin loop epsAOpa[i+NConExt+2*NConPar+NConBou+NSurBou] = epsConExtWinOpa[i] * AConExtWinOpa[i] ;;epsAOpa[i+NConExt+2*NConPar+NConBou+NSurBou+NConExtWin] = epsConExtWinFra[i] * AConExtWinFra[i] ;;end for ;;)
+                ' # (for i in 1:NConExtWin loop epsAGla[i] = AGla[i] * epsGla[i] ;;epsASha[i]    = AGla[i] * epsSha[i] ;;epsTauASha[i] = AGla[i] * epsGla[i] * tauSha[i] ;;end for ;;)
+                ' + sha_internal.T( fill ( 293.15, NConExtWin )   )
+                ' + uSha_internal( fill ( 0, NConExtWin )   )
+                ' + (for i in 1:NConExt loop TOpa[i] = conExt[i].T ;;end for ;;)
+                ' + (for i in 1:NConPar loop TOpa[i+NConExt]         = conPar_a[i].T ;;TOpa[i+NConExt+NConPar] = conPar_b[i].T ;;end for ;;)
+                ' + (for i in 1:NConBou loop TOpa[i+NConExt+2*NConPar] = conBou[i].T ;;end for ;;)
+                ' + (for i in 1:NSurBou loop TOpa[i+NConExt+2*NConPar+NConBou] = conSurBou[i].T ;;end for ;;)
+                ' + (for i in 1:NConExtWin loop TOpa[i+NConExt+2*NConPar+NConBou+NSurBou]            = conExtWin[i].T ;;TOpa[i+NConExt+2*NConPar+NConBou+NConExtWin+NSurBou] = conExtWinFra[i].T ;;end for ;;)
+                ' + (for i in 1:NConExtWin loop TGlaUns[i] = glaUns_internal[i].T ;;TGlaSha[i] = glaSha_internal[i].T ;;TSha[i]    = sha_internal[i].T ;;end for ;;)
+                ' + else TRad(  ( sum ( epsAOpa[i] * TOpa[i] for i in 1:NOpa )  + sum ( epsAGla .* TGlaUns )  )  /  ( sum ( epsAOpa )  + sum ( epsAGla )  )   )
+                ' + else conExt[1].T( 293.15  )
+                ' + 0( conPar_b[i].Q_flow  )
+                ' + else conPar_a[1].T( 293.15  )
+                ' + conPar_b[1].T( 293.15  )
+                ' + else conBou[1].T( 293.15  )
+                ' + else conSurBou[1].T( 293.15  )
+                ' + 0( conExtWinFra[i].Q_flow  )
+                ' + else conExtWin[1].T   ( 293.15  )
+                ' + conExtWinFra[1].T( 293.15  )
+            }
+            Class PartialSurfaceInterfaceRadiative << partial model >>  {
+                ' # << parameter >> epsConExt[NConExt] :Emissivity
+                ' # << parameter >> epsConExtWinOpa[NConExtWin] :Emissivity
+                ' # << parameter >> epsConExtWinUns[NConExtWin] :Emissivity
+                ' # << parameter >> epsConExtWinSha[NConExtWin] :Emissivity
+                ' # << parameter >> epsConExtWinFra[NConExtWin] :Emissivity
+                ' # << parameter >> epsConPar_a[NConPar] :Emissivity
+                ' # << parameter >> epsConPar_b[NConPar] :Emissivity
+                ' # << parameter >> epsConBou[NConBou] :Emissivity
+                ' # << parameter >> epsSurBou[NSurBou] :Emissivity
+            }
+            Class PartialSurfaceInterface << partial model >>  {
+                ' + Modelica.Thermal.HeatTransfer.Interfaces.HeatPort_a conExt[NConExt]  
+                ' + Modelica.Thermal.HeatTransfer.Interfaces.HeatPort_a conExtWin[NConExtWin]  
+                ' + Modelica.Thermal.HeatTransfer.Interfaces.HeatPort_a conExtWinFra[NConExtWin]  
+                ' + Modelica.Thermal.HeatTransfer.Interfaces.HeatPort_a conPar_a[NConPar]  
+                ' + Modelica.Thermal.HeatTransfer.Interfaces.HeatPort_a conPar_b[NConPar]  
+                ' + Modelica.Thermal.HeatTransfer.Interfaces.HeatPort_a conBou[NConBou]  
+                ' + Modelica.Thermal.HeatTransfer.Interfaces.HeatPort_a conSurBou[NSurBou]  
+                ' # final parameter String instanceName = getInstanceName  {    }   
+                ' # final parameter Modelica.Units.SI.Area AConExt [ NConExt ] =datConExt.A 
+                ' # final parameter Modelica.Units.SI.Area AConExtWinOpa [ NConExtWin ] =datConExtWin.AOpa 
+                ' # final parameter Modelica.Units.SI.Area AConExtWinGla [ NConExtWin ] =  {  1 .- datConExtWin.fFra   }    .* datConExtWin.AWin 
+                ' # final parameter Modelica.Units.SI.Area AConExtWinFra [ NConExtWin ] =datConExtWin.fFra .* datConExtWin.AWin 
+                ' # final parameter Modelica.Units.SI.Area AConPar [ NConPar ] =datConPar.A 
+                ' # final parameter Modelica.Units.SI.Area AConBou [ NConBou ] =datConBou.A 
+                ' # final parameter Modelica.Units.SI.Area ASurBou [ NSurBou ] =surBou.A 
+            }
+            Class RadiationAdapter << model >>  {
+                ' + Modelica.Blocks.Interfaces.RealOutput QRad_flow 
+                ' + QRad_flow( rad.Q_flow)
+                ' + rad.T( TRad  )
+            }
+            Class HeatGain << model >>  {
+                + << parameter >> AFlo: Area 
+                ' + Modelica.Blocks.Interfaces.RealInput qGai_flow [ 3 ]  
+                ' + Modelica.Blocks.Interfaces.RealOutput QRad_flow  {  unit="W"  }   
+                ' + Modelica.Blocks.Interfaces.RealOutput QCon_flow  {  unit="W"  }   
+                ' + Modelica.Blocks.Interfaces.RealOutput QLat_flow  {  unit="W"  }   
+                ' + {QRad_flow, QCon_flow, QLat_flow}( AFlo .* qGai_flow)
+            }
+            Class ExteriorBoundaryConditions < <<replaceable parameter>>\n conPar: ParameterConstruction > << model >>  {
+                + << parameter >> nCon: Integer
+                + << parameter >> linearizeRadiation: Boolean
+                ' + replaceable parameter ParameterConstruction conPar [ nCon ]  constrainedby ParameterConstruction 
+                ' + Modelica.Thermal.HeatTransfer.Interfaces.HeatPort_a opa_a [ nCon ]  
+                + << parameter >> conMod: ExteriorConvection
+                + << parameter >> hFixed: CoefficientOfHeatTransfer 
+                ' + Modelica.Blocks.Math.Add HTotConExt [ nCon ]    {    final k1=conPar [ : ] .layers.absSol_a .* AOpa, final k2=conPar [ : ] .layers.absSol_a .* AOpa  }   
+                ' # <<parameter>> Modelica.Units.SI.Area AOpa [ nCon ] =conPar [ : ] .A 
+                ' # Modelica.Blocks.Routing.Replicator repConExt  {  nout=nCon  }   
+                ' # Modelica.Blocks.Routing.Replicator repConExt1   {    nout=nCon  }   
+                ' # Modelica.Blocks.Routing.Replicator repConExt2   {    nout=nCon  }   
+                ' + connect  (  conOpa.solid, opa_a )  annotation   (  Line  (   point({{-180,180},{-240,180},{-240,200},{-300,200}}, color={191,0,0}, smooth=Smooth.None )  ) )
+                ' + connect  (  skyRadExc.port, opa_a )  annotation   (  Line  (   point({{-180,260},{-212,260},{-212,260},{-240,260},{-240,200},{-300,200}}, color={191,0,0}, smooth=Smooth.None )  )   )
+                ' + connect  (  TAirConExt.port, conOpa.fluid )  annotation   (  Line  (   point({{-32,180},{-140,180}}, color={191,0,0}, smooth=Smooth.None )  )   )
+                ' + connect  (  repConExt.y, TAirConExt.T )  annotation   (  Line  (   point({{79,180},{12,180}}, color={0,0,127}, smooth=Smooth.None )  )   )
+                ' + connect  (  repConExt.u, weaBus.TDryBul )  annotation   (  Line  (   point({{102,180},{244,180},{244,42}}, color={0,0,127}, smooth=Smooth.None ) , Text (  textString=)
+                ' + connect  (  skyRadExc.TOut, weaBus.TDryBul )  annotation   (  Line  (   point({{-136,252},{244,252},{244,42}}, color={0,0,127}, smooth=Smooth.None ) , Text (  textString=)
+                ' + connect  (  skyRadExc.TBlaSky, weaBus.TBlaSky )  annotation   (  Line  (   point({{-136,268},{244,268},{244,42}}, color={0,0,127}, smooth=Smooth.None ) , Text (  textString=)
+                ' + (for i in 1:nCon loop connect  (  weaBus, HDirTil[i].weaBus )  annotation   (  Line  (   points={{244,42},{244,130},{220,130}}, color={255,204,51}, thickness=0.5, smooth=Smooth.None ) , Text (  textString;connect  (  HDifTil[i].weaBus, weaBus )  annotation   (  Line  (   points={{220,90},{244,90},{244,42}}, color={255,204,51}, thickness=0.5, smooth=Smooth.None ) , Text (  textString;end for ;;)
+                ' + connect  (  HTotConExt.y, solHeaGaiConExt.Q_flow )  annotation   (  Line  (   point({{19,110},{5.55112e-16,110}}, color={0,0,127}, smooth=Smooth.None )  )   )
+                ' + connect  (  solHeaGaiConExt.port, opa_a )  annotation   (  Line  (   point({{-20,110},{-240,110},{-240,200},{-300,200}}, color={191,0,0}, smooth=Smooth.None )  )   )
+                ' + connect  (  HDirTil.H, HTotConExt.u1 )  annotation   (  Line  (   point({{199,130},{60,130},{60,116},{42,116}}, color={0,0,127}, smooth=Smooth.None )  )   )
+                ' + connect  (  HDifTil.H, HTotConExt.u2 )  annotation   (  Line  (   point({{199,90},{60,90},{60,104},{42,104}}, color={0,0,127}, smooth=Smooth.None )  )   )
+                ' + connect  (  repConExt2.u, weaBus.winDir )  annotation   (  Line  (   point({{182,230},{244,230},{244,42}}, color={0,0,127}, smooth=Smooth.None ) , Text (  textString=)
+                ' + connect  (  repConExt1.u, weaBus.winSpe )  annotation   (  Line  (   point({{132,210},{244,210},{244,42}}, color={0,0,127}, smooth=Smooth.None ) , Text (  textString=)
+                ' + connect  (  repConExt1.y, conOpa.v )  annotation   (  Line  (   point({{109,210},{-194,210},{-194,200},{-184,200}}, color={0,0,127}, smooth=Smooth.None )  )   )
+                ' + connect  (  repConExt2.y, conOpa.dir )  annotation   (  Line  (   point({{159,230},{-200,230},{-200,190},{-184,190}}, color={0,0,127}, smooth=Smooth.None )  )   )
+            }
+            Class ExteriorBoundaryConditionsWithWindow << model >>  {
+                ' + extends Buildings.ThermalZones.Detailed.BaseClasses.ExteriorBoundaryConditions   {    final AOpa=conPar [ : ] .AOpa, redeclare Buildings.ThermalZones.Detailed.BaseClasses.ParameterConstructionWithWindow conPar   }   
+                ' + final parameter Modelica.Units.SI.Area AWin [ nCon ] =conPar [ : ] .hWin .* conPar [ : ] .wWin 
+                ' + final parameter Boolean haveExteriorShade [ nCon ]  = conPar [ : ] .glaSys.haveExteriorShade 
+                ' + final parameter Boolean haveInteriorShade [ nCon ]  = conPar [ : ] .glaSys.haveInteriorShade 
+                ' + final parameter Boolean haveShade= Modelica.Math.BooleanVectors.anyTrue   {   haveExteriorShade  }   or Modelica.Math.BooleanVectors.anyTrue   {   haveInteriorShade  }   
+                ' + final parameter Boolean haveOverhangOrSideFins= Modelica.Math.BooleanVectors.anyTrue   {   conPar.haveOverhangOrSideFins  }   
+                ' + Modelica.Blocks.Interfaces.RealInput uSha [ nCon ]    {    each min=0, each max=1  }   if haveShade 
+                ' + Modelica.Blocks.Interfaces.RealInput QAbsSolSha_flow [ nCon ]    {    each final unit="W", each quantity=
+                ' + Modelica.Thermal.HeatTransfer.Interfaces.HeatPort_a glaUns [ nCon ]  
+                ' + Modelica.Thermal.HeatTransfer.Interfaces.HeatPort_a glaSha [ nCon ]  if haveShade 
+                ' + Modelica.Thermal.HeatTransfer.Interfaces.HeatPort_a fra [ nCon ]    {    each T   {    nominal=300, start=283.15  }    }   
+                ' + Modelica.Blocks.Math.Add HTotConExtWinFra [ nCon ]    {    final k1=conPar [ : ] .fFra .* conPar [ : ] .glaSys.absSolFra .* conPar [ : ] .AWin, final k2=conPar [ : ] .fFra .* conPar [ : ] .glaSys.absSolFra .* conPar [ : ] .AWin  }   
+                ' + Modelica.Blocks.Interfaces.RealOutput HDir [ nCon ]    {    each final quantity="RadiantEnergyFluenceRate", each final unit=
+                ' + Modelica.Blocks.Interfaces.RealOutput HDif [ nCon ]    {    each final quantity="RadiantEnergyFluenceRate", each final unit=
+                ' + Modelica.Blocks.Interfaces.RealOutput inc [ nCon ]    {    each final quantity="Angle", each final unit=
+                ' # Modelica.Blocks.Routing.Replicator repConExtWin  {  final nout=nCon  }   
+                ' # Modelica.Blocks.Routing.Replicator repConExtWinVWin  {  final nout=nCon  }   
+                ' # Modelica.Blocks.Routing.Replicator repConExtWinTSkyBla  {  final nout=nCon  }   
+                ' + connect  (  uSha, conExtWin.uSha )  annotation   (  Line  (   point({{-320,100},{-140,100},{-140,-40},{40,-40},{40,-66},{22.4,-66}}, color={0,0,127}, smooth=Smooth.None )  ) )
+                ' + connect  (  JInUns,conExtWin. JInUns )  annotation   (  Line  (   point({{-310,20},{-200,20},{-200,-72},{-43,-72}}, color={0,0,0}, smooth=Smooth.None )  )   )
+                ' + connect  (  conExtWin.JOutUns,JOutUns )   annotation   (  Line  (   point({{-43,-66},{-196.45,-66},{-196.45,-20},{-310,-20}}, color={0,127,0}, smooth=Smooth.None )  )   )
+                ' + connect  (  conExtWin.glaUns,glaUns )   annotation   (  Line  (   point({{-40,-84},{-192,-84},{-192,-80},{-300,-80}}, color={191,0,0}, smooth=Smooth.None )  )   )
+                ' + connect  (  conExtWin.glaSha,glaSha )   annotation   (  Line  (   point({{-40,-96},{-190,-96},{-190,-120},{-300,-120}}, color={191,0,0}, smooth=Smooth.None )  )   )
+                ' + connect  (  conExtWin.JOutSha,JOutSha )   annotation   (  Line  (   point({{-43,-108},{-176,-108},{-176,-200},{-310,-200}}, color={0,127,0}, smooth=Smooth.None )  )   )
+                ' + connect  (  conExtWin.JInSha,JInSha )   annotation   (  Line  (   point({{-43,-114},{-184.45,-114},{-184.45,-160},{-310,-160}}, color={0,0,0}, smooth=Smooth.None )  )   )
+                ' + connect  (  conExtWin.frame,fra )   annotation   (  Line  (   point({{-31,-120},{-31,-220},{-260,-220},{-260,-260},{-300,-260}}, color={191,0,0}, smooth=Smooth.None )  )   )
+                ' + connect  (  TAirConExtWin.port,conExtWin. air )  annotation   (  Line  (   point({{120,-70},{90,-70},{90,-90},{20,-90}}, color={191,0,0}, smooth=Smooth.None )  )   )
+                ' + connect  (  TAirConExtWin.T,repConExtWin. y )  annotation   (  Line  (   point({{164,-70},{199,-70}}, color={0,0,127}, smooth=Smooth.None )  )   )
+                ' + connect  (  repConExtWin.u, weaBus.TDryBul )  annotation   (  Line  (   point({{222,-70},{244,-70},{244,42}}, color={0,0,127}, smooth=Smooth.None ) , Text (  textString=)
+                ' + connect  (  repConExtWinVWin.y,conExtWin. vWin )  annotation   (  Line  (   point({{119,-12},{50,-12},{50,-78},{22.4,-78}}, color={0,0,127}, smooth=Smooth.None )  )   )
+                ' + connect  (  repConExtWinVWin.u, weaBus.winSpe )  annotation   (  Line  (   point({{142,-12},{192,-12},{192,-14},{244,-14},{244,42}}, color={0,0,127}, smooth=Smooth.None ) , Text (  textString=)
+                ' + connect  (  HTotConExtWinFra.y, solHeaGaiConWin.Q_flow )  annotation   (  Line  (   point({{19,70},{0,70}}, color={0,0,127}, smooth=Smooth.None )  )   )
+                ' + connect  (  solHeaGaiConWin.port, fra )  annotation   (  Line  (   point({{-20,70},{-60,70},{-60,-220},{-260,-220},{-260,-260},{-300,-260}}, color={191,0,0}, smooth=Smooth.None )  )   )
+                ' + connect  (  HDifTil.H, HDif )  annotation   (  Line  (   point({{199,90},{72,90},{72,60},{310,60}}, color={0,0,127}, smooth=Smooth.None )  )   )
+                ' + connect  (  HDirTil.inc, inc )  annotation   (  Line  (   point({{199,126},{180,126},{180,112},{260,112},{260,180},{310,180}}, color={0,0,127}, smooth=Smooth.None )  )   )
+                ' + connect  (  HTotConExtWinFra.u2, HDifTil.H )  annotation   (  Line  (   point({{42,64},{72,64},{72,90},{199,90}}, color={0,0,127}, smooth=Smooth.None )  )   )
+                ' + connect  (  skyRadExcWin.TOut, weaBus.TDryBul )  annotation   (  Line  (   point({{-136,-268},{244,-268},{244,42}}, color={0,0,127}, smooth=Smooth.None ) , Text (  textString=)
+                ' + connect  (  skyRadExcWin.TBlaSky, weaBus.TBlaSky )  annotation   (  Line  (   point({{-136,-252},{244,-252},{244,42}}, color={0,0,127}, smooth=Smooth.None ) , Text (  textString=)
+                ' + connect  (  skyRadExcWin.port, fra )  annotation   (  Line  (   point({{-180,-260},{-242,-260},{-242,-260},{-300,-260}}, color={191,0,0}, smooth=Smooth.None )  )   )
+                ' + connect  (  repConExtWin.y, conExtWin.TOut )  annotation   (  Line  (   point({{199,-70},{180,-70},{180,-114.6},{23,-114.6}}, color={0,0,127}, smooth=Smooth.None )  )   )
+                ' + connect  (  repConExtWinTSkyBla.y, conExtWin.TBlaSky )  annotation   (  Line  (   point({{199,-102},{23,-102}}, color={0,0,127}, smooth=Smooth.None )  )   )
+                ' + connect  (  repConExtWinTSkyBla.u, weaBus.TBlaSky )  annotation   (  Line  (   point({{222,-102},{244,-102},{244,42}}, color={0,0,127}, smooth=Smooth.None ) , Text (  textString=)
+                ' + (for i in 1:nCon loop connect  (  sha[i].weaBus, weaBus )  annotation   (  Line  (   points={{140,110},{244,110},{244,42}}, color={255,204,51}, thickness=0.5, smooth=Smooth.None ) , Text (  textString;end for ;;)
+                ' + connect  (  HDirTil.inc, sha.incAng )  annotation   (  Line  (   point({{199,126},{168,126},{168,104},{142,104}}, color={0,0,127}, smooth=Smooth.None )  )   )
+                ' + connect  (  sha.HDirTil, HDir )  annotation   (  Line  (   point({{119,116},{100,116},{100,70},{280,70},{280,120},{310,120}}, color={0,0,127}, smooth=Smooth.None )  )   )
+                ' + else connect  (  HDirTil.H, HTotConExtWinFra.u1 )  annotation   (  Line  (   point({{199,130},{100,130},{100,76},{42,76}}, color={0,0,127}, smooth=Smooth.None )  )   )
+                ' + connect  (  HDirTil.H, HDir )  annotation   (  Line  (   point({{199,130},{100,130},{100,70},{280,70},{280,120},{310,120}}, color={0,0,127}, smooth=Smooth.None )  )   )
+            }
+            Class InfraredRadiationGainDistribution << model >>  {
+                + << parameter >> haveShade: Boolean
+                ' + Modelica.Blocks.Interfaces.RealInput uSha [ NConExtWin ]   {  each min=0, each max=1  }   if haveShade 
+                ' + Modelica.Blocks.Interfaces.RealInput Q_flow 
+                ' # Real fraConExt [ NConExt ]  = AEpsConExt*sumAEpsInv 
+                ' # Real fraConExtWinOpa [ NConExtWin ]  = AEpsConExtWinOpa*sumAEpsInv 
+                ' # Real fraConExtWinGla [ NConExtWin ]  =   {  AEpsConExtWinSha + AEpsConExtWinUns  }  *sumAEpsInv 
+                ' # Real fraConExtWinFra [ NConExtWin ]  = AEpsConExtWinFra*sumAEpsInv 
+                ' # Real fraConPar_a [ NConPar ]  = AEpsConPar_a*sumAEpsInv 
+                ' # Real fraConPar_b [ NConPar ]  = AEpsConPar_b*sumAEpsInv 
+                ' # Real fraConBou [ NConBou ]  = AEpsConBou*sumAEpsInv 
+                ' # Real fraSurBou [ NSurBou ]  = AEpsSurBou*sumAEpsInv 
+                ' # parameter Real AEpsConExt [ NConExt ]  = {AConExt [ i ] *epsConExt [ i ]  for i in 1:NConExt} 
+                ' # parameter Real AEpsConExtWinOpa [ NConExtWin ]  = {AConExtWinOpa [ i ] *epsConExtWinOpa [ i ]  for i in 1:NConExtWin} 
+                ' # Real AEpsConExtWinUns [ NConExtWin ]  = {shaSig [ i ] .yCom * AConExtWinGla [ i ] *epsConExtWinUns [ i ]  for i in 1:NConExtWin} 
+                ' # Real AEpsConExtWinSha [ NConExtWin ]  = {shaSig [ i ] .y    * AConExtWinGla [ i ] *epsConExtWinSha [ i ]  for i in 1:NConExtWin} 
+                ' # parameter Real AEpsConExtWinFra [ NConExtWin ]  = {AConExtWinFra [ i ] *epsConExtWinFra [ i ]  for i in 1:NConExtWin} 
+                ' # parameter Real AEpsConPar_a [ NConPar ]  = {AConPar [ i ] *epsConPar_a [ i ]  for i in 1:NConPar} 
+                ' # parameter Real AEpsConPar_b [ NConPar ]  = {AConPar [ i ] *epsConPar_b [ i ]  for i in 1:NConPar} 
+                ' # parameter Real AEpsConBou [ NConBou ]  = {AConBou [ i ] *epsConBou [ i ]  for i in 1:NConBou} 
+                ' # parameter Real AEpsSurBou [ NSurBou ]  = {ASurBou [ i ] *epsSurBou [ i ]  for i in 1:NSurBou} 
+                ' # parameter Real sumAEpsNoWin  {  fixed=false  }   
+                ' # Real sumAEpsInv 
+                ' # sumAEpsNoWin( sum ( AEpsConExt ) +sum ( AEpsConExtWinOpa ) +sum ( AEpsConExtWinFra )  +sum  (  AEpsConPar_a ) +sum  (  AEpsConPar_b ) +sum  (  AEpsConBou ) +sum  (  AEpsSurBou ) )
+                ' + sumAEpsInv  ( 1.0/ ( sumAEpsNoWin + sum ( AEpsConExtWinUns )  + sum ( AEpsConExtWinSha )  )   )
+                ' + (if haveConExt then conExt.Q_flow    = -fraConExt*Q_flow ;;)
+                ' + (else conExt[1].T = 293.15 ;;)
+                ' + (end if ;)
+                ' + (if haveConExtWin then conExtWin.Q_flow = -fraConExtWinOpa*Q_flow ;;)
+                ' + (else conExtWin[1].T = 293.15 ;;)
+                ' + (end if ;)
+                ' + (if haveConPar then conPar_a.Q_flow  = -fraConPar_a*Q_flow ;;conPar_b.Q_flow  = -fraConPar_b*Q_flow ;;)
+                ' + (else conPar_a[1].T = 293.15 ;;conPar_b[1].T = 293.15 ;;)
+                ' + (end if ;)
+                ' + (if haveConBou then conBou.Q_flow    = -fraConBou*Q_flow ;;)
+                ' + (else conBou[1].T = 293.15 ;;)
+                ' + (end if ;)
+                ' + (if haveSurBou then conSurBou.Q_flow    = -fraSurBou*Q_flow ;;)
+                ' + (else conSurBou[1].T = 293.15 ;;)
+                ' + (end if ;)
+                ' + JOutConExtWin       ( +fraConExtWinGla*Q_flow  )
+                ' + (if haveConExtWin then conExtWinFra.Q_flow  = -fraConExtWinFra*Q_flow ;;)
+                ' + (else conExtWinFra[1].T = 293.15 ;;)
+                ' + (end if ;)
+                ' + (assert  (  abs  (  1 - sum  (  fraConExt )  - sum  (  fraConExtWinOpa ) - sum  (  fraConExtWinGla )  - sum  (  fraConExtWinFra )  - sum  (  fraConPar_a )  - sum  (  fraConPar_b )  - sum  (  fraConBou )  - sum  (  fraSurBou )  )   < 1E-5, "Programming error: Radiation balance is wrong. Check equations."  )   ;  )
+            }
+            Class InfraredRadiationExchange << model >>  {
+                ' + constant Boolean homotopyInitialization = true 
+                + << parameter >> linearizeRadiation: Boolean
+                + << parameter >> sampleModel: Boolean
+                ' # constant Real T30  {  unit="K3"  }   = 293.15^3 
+                ' # constant Real T40  {  unit="K4"  }   = 293.15^4 
+                ' # final parameter Integer NOpa=NConExt + 2*NConExtWin + 2*NConPar + NConBou + NSurBou 
+                ' # final parameter Integer nOpa=nConExt + 2*nConExtWin + 2*nConPar + nConBou + nSurBou 
+                ' # final parameter Integer NWin=NConExtWin 
+                ' # final parameter Integer nWin=nConExtWin 
+                ' # final parameter Integer NTot=NOpa + NWin 
+                ' # final parameter Integer nTot=nOpa + nWin 
+                ' # final parameter Real epsOpa [ nOpa ]    {    each min=0, each max=1, each fixed=false  }   
+                ' # final parameter Real rhoOpa [ nOpa ]    {    each min=0, each max=1, each fixed=false  }   
+                ' # final parameter Modelica.Units.SI.Area AOpa [ nOpa ]   {  each fixed=false  }   
+                ' # final parameter Modelica.Units.SI.Area A [ nTot ]   {  each fixed=false  }   
+                ' # final parameter Real kOpa [ nOpa ]   {  each unit="W/K4", each fixed=false  }   
+                ' # final parameter Real kOpaInv [ nOpa ]   {  each unit="K4/W", each fixed=false  }   
+                ' # final parameter Real F [ nTot, nTot ]    {    each min=0, each max=1, each fixed=false  }   
+                ' # parameter Modelica.Units.SI.Time t0  {  fixed=false  }   
+                ' # Real T4Opa [ nOpa ]    {    each unit="K4", each start=T40, each nominal=293.15^4  }   
+                ' # parameter Modelica.Units.SI.Temperature T0=293.15 
+                ' # final parameter Real T03   {    min=0, unit="K3"  }   = T0^3 
+                ' # (assert  (  homotopyInitialization, "In " + getInstanceName  (   )  + ": The constant homotopyInitialization has been modified from its default value. This constant will be removed in future releases.", level = AssertionLevel.warning )  )
+                ' # (for i in 1:nConExt loop epsOpa[i] = epsConExt[i] ;;AOpa[i] = AConExt[i] ;;kOpa[i] = Modelica.Constants.sigma*epsConExt[i]*AOpa[i] ;;end for ;;)
+                ' # (for i in 1:nConPar loop epsOpa[i + nConExt] = epsConPar_a[i] ;;AOpa[i + nConExt] = AConPar[i] ;;kOpa[i + nConExt] = Modelica.Constants.sigma*epsConPar_a[i]*AOpa[i + nConExt] ;;epsOpa[i + nConExt + nConPar] = epsConPar_b[i] ;;AOpa[i + nConExt + nConPar] = AConPar[i] ;;kOpa[i + nConExt + nConPar] = Modelica.Constants.sigma*epsConPar_b[i]*AOpa[ i + nConExt + nConPar] ;;end for ;;)
+                ' # (for i in 1:nConBou loop epsOpa[i + nConExt + 2*nConPar] = epsConBou[i] ;;AOpa[i + nConExt + 2*nConPar] = AConBou[i] ;;kOpa[i + nConExt + 2*nConPar] = Modelica.Constants.sigma*epsConBou[i]*AOpa[ i + nConExt + 2*nConPar] ;;end for ;;)
+                ' # (for i in 1:nSurBou loop epsOpa[i + nConExt + 2*nConPar + nConBou] = epsSurBou[i] ;;AOpa[i + nConExt + 2*nConPar + nConBou] = ASurBou[i] ;;kOpa[i + nConExt + 2*nConPar + nConBou] = Modelica.Constants.sigma* epsSurBou[i]*AOpa[i + nConExt + 2*nConPar + nConBou] ;;end for ;;)
+                ' # (for i in 1:nConExtWin loop epsOpa[i + nConExt + 2*nConPar + nConBou + nSurBou] = epsConExtWinOpa[i] ;;AOpa[i + nConExt + 2*nConPar + nConBou + nSurBou] = AConExtWinOpa[i] ;;kOpa[i + nConExt + 2*nConPar + nConBou + nSurBou] = Modelica.Constants.sigma *epsConExtWinOpa[i]*AOpa[i + nConExt + 2*nConPar + nConBou + nSurBou] ;;epsOpa[i + nConExt + 2*nConPar + nConBou + nSurBou + nConExtWin] = epsConExtWinFra[i] ;;AOpa[i + nConExt + 2*nConPar + nConBou + nSurBou + nConExtWin] = AConExtWinFra[i] ;;kOpa[i + nConExt + 2*nConPar + nConBou + nSurBou + nConExtWin] = Modelica.Constants.sigma *epsConExtWinFra[i]*AOpa[i + nConExt + 2*nConPar + nConBou + nSurBou + nConExtWin] ;;end for ;;)
+                ' # (for i in 1:nOpa loop A[i] = AOpa[i] ;;end for ;;)
+                ' # (for i in 1:nWin loop A[i + nOpa] = AConExtWinGla[i] ;;end for ;;)
+                ' # rhoOpa( 1 .- epsOpa  )
+                ' # (for i in 1:nTot loop for j in 1:nTot loop F[i, j] = A[j]/sum (  ( A[k] )  for k in 1:nTot )  ;;end for ;;)
+                ' # (for i in 1:nOpa loop kOpaInv[i] = 1/kOpa[i] ;;end for ;;)
+                ' # (for i in 1:nTot loop assert  (    (  abs  (  1 - sum  (  F[i, j] for j in 1:nTot )  )  )  < 1E-10,;end for ;;)
+                ' # t0( time  )
+                ' + Q_flow( -pre ( J )  - G  )
+                ' + else G( -transpose ( F ) *J  )
+                ' + Q_flow( -J - G  )
+                ' + (for j in 1:nOpa loop T4Opa[j] =  ( -J[j] - rhoOpa[j]*G[j] ) *kOpaInv[j] ;;end for ;;)
+                ' + else if homotopyInitialization then TOpa( homotopy ( actual=Buildings.Utilities.Math.Functions.powerLinearized (  x=T4Opa, x0=243.15^4, n=0.25 ) , simplified= ( T4Opa .+ 3*T40 ) / ( 4*T30 )  )   )
+                ' + else TOpa( Buildings.Utilities.Math.Functions.powerLinearized (  x=T4Opa, x0=243.15^4, n=0.25 )   )
+                ' + (for j in 1:nWin loop J[j + nOpa] = -JInConExtWin_internal[j] ;;G[j + nOpa] = +JOutConExtWin[j] ;;end for ;;)
+                ' + (for i in 1:nConExt loop Q_flow[i] = conExt[i].Q_flow ;;end for ;;)
+                ' + (for i in 1:nConPar loop Q_flow[i + nConExt] = conPar_a[i].Q_flow ;;Q_flow[i + nConExt + nConPar] = conPar_b[i].Q_flow ;;end for ;;)
+                ' + conPar_b[1].T( T0  )
+                ' + (for i in 1:nConBou loop Q_flow[i + nConExt + 2*nConPar] = conBou[i].Q_flow ;;end for ;;)
+                ' + (for i in 1:nSurBou loop Q_flow[i + nConExt + 2*nConPar + nConBou] = conSurBou[i].Q_flow ;;end for ;;)
+                ' + (for i in 1:nConExtWin loop Q_flow[i + nConExt + 2*nConPar + nConBou + nSurBou] = conExtWin[i].Q_flow ;;Q_flow[i + nConExt + 2*nConPar + nConBou + nSurBou + nConExtWin] = conExtWinFra[i].Q_flow ;;end for ;;)
+                ' + conExtWinFra[1].T( T0  )
+                ' + JOutConExtWin[1]( 0  )
+            }
+            Class SolarRadiationExchange << model >>  {
+                + << parameter >> is_floorConExt[NConExt]: Boolean
+                + << parameter >> is_floorConExtWin[NConExtWin]: Boolean
+                + << parameter >> is_floorConPar_a[NConPar]: Boolean
+                + << parameter >> is_floorConPar_b[NConPar]: Boolean
+                + << parameter >> is_floorConBou[NConBou]: Boolean
+                + << parameter >> is_floorSurBou[NSurBou]: Boolean
+                + << parameter >> tauGla[NConExtWin]: Emissivity
+                ' + Modelica.Blocks.Interfaces.RealInput JInDifConExtWin [ NConExtWin ]   {  each unit="W"  }   
+                ' + Modelica.Blocks.Interfaces.RealInput JInDirConExtWin [ NConExtWin ]   {  each unit="W"  }   
+                ' + Modelica.Blocks.Interfaces.RealOutput HOutConExtWin [ NConExtWin ]   {  each unit="W/m2"  }   
+                ' # final parameter Real kDir1  {  unit="1", fixed=false  }   
+                ' # final parameter Real kDir2  {  fixed=false  }   
+                ' # final parameter Integer NOpa = NConExt+2*NConExtWin+2*NConPar+NConBou+NSurBou 
+                ' # final parameter Integer NWin = NConExtWin 
+                ' # final parameter Integer NTot = NOpa + NWin 
+                ' # final parameter Boolean is_flo [ NTot ]   {  each fixed=false  }   
+                ' # final parameter Real eps [ NTot ]   {  each min=0, each max=1, each fixed=false  }   
+                ' # final parameter Real tau [ NTot ]   {  each min=0, each max=1, each fixed=false  }   
+                ' # final parameter Modelica.Units.SI.Area AFlo  {  fixed=false  }   
+                ' # final parameter Modelica.Units.SI.Area A [ NTot ]   {  each fixed=false  }   
+                ' # final parameter Real kDif [ NTot ]    {    each unit="1", each fixed=false  }   
+                ' # final parameter Real kDir [ NTot ]    {    each unit="1", each fixed=false  }   
+                ' # final parameter Real epsTauA [ NTot ]    {    each unit="m2", each fixed=false  }   
+                ' # final parameter Real sumEpsTauA  {  unit="m2", fixed=false  }   
+                ' # (for i in 1:NConExt loop eps[i] = epsConExt[i;A[i]      = AConExt[i] ;;is_flo[i]  = is_floorConExt[i] ;;end for ;;)
+                ' # (for i in 1:NConPar loop eps[i+NConExt]           = epsConPar_a[i] ;;A[i+NConExt]             = AConPar[i] ;;is_flo[i+NConExt]         = is_floorConPar_a[i] ;;eps[i+NConExt+NConPar]   = epsConPar_b[i] ;;A[i+NConExt+NConPar]     = AConPar[i] ;;is_flo[i+NConExt+NConPar] = is_floorConPar_b[i] ;;end for ;;)
+                ' # (for i in 1:NConBou loop eps[i+NConExt+2*NConPar]   = epsConBou[i] ;;A[i+NConExt+2*NConPar]     = AConBou[i] ;;is_flo[i+NConExt+2*NConPar] = is_floorConBou[i] ;;end for ;;)
+                ' # (for i in 1:NSurBou loop eps[i+NConExt+2*NConPar+NConBou]   = epsSurBou[i] ;;A[i+NConExt+2*NConPar+NConBou]     = ASurBou[i] ;;is_flo[i+NConExt+2*NConPar+NConBou] = is_floorSurBou[i] ;;end for ;;)
+                ' # (for i in 1:NConExtWin loop eps[i+NConExt+2*NConPar+NConBou+NSurBou]   = epsConExtWinOpa[i] ;;A[i+NConExt+2*NConPar+NConBou+NSurBou]     = AConExtWinOpa[i] ;;is_flo[i+NConExt+2*NConPar+NConBou+NSurBou] = is_floorConExtWin[i] ;;eps[i+NConExt+2*NConPar+NConBou+NSurBou+NConExtWin]   = epsConExtWinFra[i] ;;A[i+NConExt+2*NConPar+NConBou+NSurBou+NConExtWin]     = AConExtWinFra[i] ;;is_flo[i+NConExt+2*NConPar+NConBou+NSurBou+NConExtWin] = is_floorConExtWin[i] ;;end for ;;)
+                ' # (for i in 1:NConExtWin loop eps[i+NConExt+2*NConPar+NConBou+NSurBou+2*NConExtWin] = epsConExtWinUns[i] ;;is_flo[i+NConExt+2*NConPar+NConBou+NSurBou+2*NConExtWin] = is_floorConExtWin[i] ;;A[i+NConExt+2*NConPar+NConBou+NSurBou+2*NConExtWin] = AConExtWinGla[i] ;;end for ;;)
+                ' # (for i in 1:NOpa loop tau[i] = 0 ;;end for ;;)
+                ' # (for i in 1:NWin loop tau[NOpa+i] = tauGla[i] ;;end for ;;)
+                ' # AFlo( sum (   ( if is_flo[i] then A[i] else 0 )  for i in 1:NTot )   )
+                ' # epsTauA(  ( eps .+ tau ) .*A  )
+                ' # sumEpsTauA( sum ( epsTauA[i] for i in 1:NTot )   )
+                ' # (for i in 1:NTot loop kDif[i] =  ( eps[i] + tau[i] ) *A[i]/sumEpsTauA ;;end for ;;)
+                ' # kDir1( sum (  ( if is_flo[i] then  ( A[i]* ( 1 - eps[i] - tau[i] )  )  else 0 )  for i in 1: NTot ) /max  (  1E-20, AFlo )   )
+                ' # kDir2( sum (  ( if is_flo[i] then 0 else epsTauA[i] )  for i in 1:NTot )   )
+                ' # (if   (  kDir2 > 1E-10 )  then for i in 1:NTot loop if is_flo[i] then kDir[i] = epsTauA[i]/AFlo ;;)
+                ' # (else kDir[i] =kDir1/kDir2*epsTauA[i] ;;)
+                ' # (end if ;)
+                ' # else for i in 1:NTot loop if is_flo[i] then kDir[i]( A[i]/AFlo  )
+                ' # else kDir[i]( 0  )
+                ' # (assert  (   AFlo > 1E-10, "Error in parameters of the room model: The geometry is incorrect:\n" + "    The room model must have a construction that is a floor,\n" + "    and this construction must not have a window.\n" + "    The parameters for the room model are such that there is no such construction.\n" + "    Revise the model parameters."  )   ;  )
+                ' # (assert ( abs ( 1 - sum ( kDif )  )  < 1E-5, "Program error: Sum of diffuse solar distribution factors in room is not equal to one. kDif=" + String  (  sum  (  kDif )  )  )  ;  )
+                ' # (assert ( abs ( 1 - sum ( kDir )  )  < 1E-5, "Program error: Sum of direct solar distribution factors in room is not equal to one. kDir=" + String  (  sum  (  kDir )  )  )  ;  )
+                ' + Q_flow(-kDif .* sum ( JInDifConExtWin )  - kDir .* sum ( JInDirConExtWin ) )
+                ' + (if haveConExt then for i in 1:NConExt loop Q_flow[i] = conExt[i].Q_flow ;;end for ;;)
+                ' + (else conExt[1].T = 293.15 ;;)
+                ' + (end if ;)
+                ' + (if haveConPar then for i in 1:NConPar loop Q_flow[i+NConExt]         = conPar_a[i].Q_flow ;;Q_flow[i+NConExt+NConPar] = conPar_b[i].Q_flow ;;end for ;;)
+                ' + (else conPar_a[1].T = 293.15 ;;conPar_b[1].T = 293.15 ;;)
+                ' + (end if ;)
+                ' + (if haveConBou then for i in 1:NConBou loop Q_flow[i+NConExt+2*NConPar] = conBou[i].Q_flow ;;end for ;;)
+                ' + (else conBou[1].T = 293.15 ;;)
+                ' + (end if ;)
+                ' + (if haveSurBou then for i in 1:NSurBou loop Q_flow[i+NConExt+2*NConPar+NConBou] = conSurBou[i].Q_flow ;;end for ;;)
+                ' + (else conSurBou[1].T = 293.15 ;;)
+                ' + (end if ;)
+                ' + (if haveConExtWin then for i in 1:NConExtWin loop Q_flow[i+NConExt+2*NConPar+NConBou+NSurBou]            = conExtWin[i].Q_flow ;;Q_flow[i+NConExt+2*NConPar+NConBou+NSurBou+NConExtWin] = conExtWinFra[i].Q_flow ;;end for ;;)
+                ' + (else conExtWin[1].T    = 293.15 ;;conExtWinFra[1].T = 293.15 ;;)
+                ' + (end if ;)
+                ' + (for j in 1:NWin loop Q_flow[j+NOpa] = JOutConExtWin[j] ;;HOutConExtWin[j] = if  ( AConExtWinGla[j] > 1E-10 )  then JOutConExtWin[j] / AConExtWinGla[j] else 0 ;;end for ;;)
             }
         }
         package Constructions{
             Class Construction << model >> {
                 ' + extends Buildings.ThermalZones.Detailed.Constructions.BaseClasses.PartialConstruction{final AOpa=A}  
             }
-            Class ConstructionWithWindow << model >> {
+            Class ConstructionWithWindow < <<replaceable parameter>> \n glaSys: GlazingSystems.Generic > << model >> {
                 ' + extends Buildings.ThermalZones.Detailed.Constructions.BaseClasses.PartialConstruction{final AOpa=A-AWin}  
                 ' + constant Boolean homotopyInitialization = true
                 + << parameter >> AWin: Area 
@@ -110,7 +445,7 @@ package Buildings{
                 Class PartialConstruction << partial model >>  {
                     + << parameter >> A: Area 
                     + << parameter >> AOpa: Area
-                    + << parameter >> layers: Buildings.HeatTransfer.Data.OpaqueConstructions.Generic
+                    + << parameter >> layers: OpaqueConstructions.Generic
                     + << parameter >> til: Angle
                     ' + << final parameter >> Boolean is_floor=til > 2.74889125 and til < 3.53428875 
                     ' + << final parameter >> Boolean is_ceiling=til > -0.392699 and til < 0.392699 
@@ -130,26 +465,26 @@ package Buildings{
 
         }
         Class MixedAir < <<replaceable package>> \n Medium: PartialMedium > << model >>  {
-        '  + extends Buildings.ThermalZones.Detailed.BaseClasses.RoomHeatMassBalance{redeclare Buildings.ThermalZones.Detailed.BaseClasses.MixedAirHeatMassBalance air{final energyDynamics=energyDynamics, final massDynamics = energyDynamics, final p_start=p_start, final T_start=T_start, final X_start=X_start, final C_start=C_start, final C_nominal=C_nominal, final mSenFac=mSenFac, final m_flow_nominal=m_flow_nominal, final homotopyInitialization=homotopyInitialization, final conMod=intConMod, final hFixed=hIntFixed, final use_C_flow = use_C_flow  }, datConExt{each T_a_start = T_start, each T_b_start = T_start  }, datConExtWin{each T_a_start = T_start, each T_b_start = T_start}, datConBou{each T_a_start = T_start, each T_b_start = T_start}, datConPar{each T_a_start = T_start, each T_b_start = T_start}}  
-        ' + << replaceable package >> Medium = PartialMedium
-        + << parameter >> use_C_flow: Boolean
-        + << parameter >> energyDynamics: Modelica.Fluid.Types.Dynamics
-        + << parameter >> mSenFac: Real
-        + << parameter >> p_start: Medium.AbsolutePressure
-        + << parameter >> T_start: Medium.Temperature 
-        + << parameter >> X_start[Medium.nX]: Medium.MassFraction
-        + << parameter >> C_start[Medium.nC]: Medium.ExtraProperty
-        + << parameter >> C_nominal[Medium.nC]: Medium.ExtraProperty
-        ' + Modelica.Blocks.Interfaces.RealInput uSha[nConExtWin]   {  each min=0, each max=1  }   if haveShade 
-        ' + Modelica.Blocks.Interfaces.RealInput C_flow[Medium.nC]  if use_C_flow 
-        ' + connect  (  uSha, conExtWin.uSha )  annotation   (  Line  (   point({{-280,180},{308,180},{308,62},{281,62}}, color={0,0,127}, smooth=Smooth.None )  ) )
-        ' + connect  (  uSha, bouConExtWin.uSha )  annotation   (  Line  (   point({{-280,180},{308,180},{308,64},{351,64}}, color={0,0,127}, smooth=Smooth.None )  )   )
-        ' + connect  (  uSha, conExtWinRad.uSha )  annotation   (  Line  (   point({{-280,180},{422,180},{422,-40},{310.2,-40},{310.2,-25.6}}, color={0,0,127}, smooth=Smooth.None )  )   )
-        ' + connect  (  irRadGai.uSha,uSha )  annotation   (  Line  (   point({{-100.833,-22.5},{-110,-22.5},{-110,180},{-280,180}}, color={0,0,127}, smooth=Smooth.None )  )   )
-        ' + connect  (  uSha, radTem.uSha )  annotation   (  Line  (   point({{-280,180},{-110,180},{-110,-62},{-100.833,-62},{-100.833,-62.5}}, color={0,0,127}, smooth=Smooth.None )  )   )
-        ' + connect  (  uSha, shaSig.u )  annotation   (  Line  (   point({{-280,180},{-248,180},{-248,160},{-222,160}}, color={0,0,127}, smooth=Smooth.None )  )   )
-        ' + connect  (  air.uSha,uSha )   annotation   (  Line  (   point({{39.6,-120},{8,-120},{8,180},{-280,180}}, color={0,0,127}, smooth=Smooth.None )  )   )
-        ' + connect ( C_flow, air.C_flow )  annotation  ( Line ( point({{-280,-110},{-200,-110},{ -200,-114},{-200,-114},{-200,-202},{-18,-202},{-18,-141},{39,-141}}, color={0,0,127} )  )   )
+            '  + extends Buildings.ThermalZones.Detailed.BaseClasses.RoomHeatMassBalance{redeclare Buildings.ThermalZones.Detailed.BaseClasses.MixedAirHeatMassBalance air{final energyDynamics=energyDynamics, final massDynamics = energyDynamics, final p_start=p_start, final T_start=T_start, final X_start=X_start, final C_start=C_start, final C_nominal=C_nominal, final mSenFac=mSenFac, final m_flow_nominal=m_flow_nominal, final homotopyInitialization=homotopyInitialization, final conMod=intConMod, final hFixed=hIntFixed, final use_C_flow = use_C_flow  }, datConExt{each T_a_start = T_start, each T_b_start = T_start  }, datConExtWin{each T_a_start = T_start, each T_b_start = T_start}, datConBou{each T_a_start = T_start, each T_b_start = T_start}, datConPar{each T_a_start = T_start, each T_b_start = T_start}}  
+            ' + << replaceable package >> Medium = PartialMedium
+            + << parameter >> use_C_flow: Boolean "部屋への微量物質の流出入を有効にするかどうか"
+            + << parameter >> energyDynamics: Modelica.Fluid.Types.Dynamics "初期状態"
+            + << parameter >> mSenFac: Real
+            + << parameter >> p_start: Medium.AbsolutePressure
+            + << parameter >> T_start: Medium.Temperature 
+            + << parameter >> X_start[Medium.nX]: Medium.MassFraction
+            + << parameter >> C_start[Medium.nC]: Medium.ExtraProperty
+            + << parameter >> C_nominal[Medium.nC]: Medium.ExtraProperty
+            ' + Modelica.Blocks.Interfaces.RealInput uSha[nConExtWin]   {  each min=0, each max=1  }   if haveShade 
+            ' + Modelica.Blocks.Interfaces.RealInput C_flow[Medium.nC]  if use_C_flow 
+            ' + connect  (  uSha, conExtWin.uSha )  annotation   (  Line  (   point({{-280,180},{308,180},{308,62},{281,62}}, color={0,0,127}, smooth=Smooth.None )  ) )
+            ' + connect  (  uSha, bouConExtWin.uSha )  annotation   (  Line  (   point({{-280,180},{308,180},{308,64},{351,64}}, color={0,0,127}, smooth=Smooth.None )  )   )
+            ' + connect  (  uSha, conExtWinRad.uSha )  annotation   (  Line  (   point({{-280,180},{422,180},{422,-40},{310.2,-40},{310.2,-25.6}}, color={0,0,127}, smooth=Smooth.None )  )   )
+            ' + connect  (  irRadGai.uSha,uSha )  annotation   (  Line  (   point({{-100.833,-22.5},{-110,-22.5},{-110,180},{-280,180}}, color={0,0,127}, smooth=Smooth.None )  )   )
+            ' + connect  (  uSha, radTem.uSha )  annotation   (  Line  (   point({{-280,180},{-110,180},{-110,-62},{-100.833,-62},{-100.833,-62.5}}, color={0,0,127}, smooth=Smooth.None )  )   )
+            ' + connect  (  uSha, shaSig.u )  annotation   (  Line  (   point({{-280,180},{-248,180},{-248,160},{-222,160}}, color={0,0,127}, smooth=Smooth.None )  )   )
+            ' + connect  (  air.uSha,uSha )   annotation   (  Line  (   point({{39.6,-120},{8,-120},{8,180},{-280,180}}, color={0,0,127}, smooth=Smooth.None )  )   )
+            ' + connect ( C_flow, air.C_flow )  annotation  ( Line ( point({{-280,-110},{-200,-110},{ -200,-114},{-200,-114},{-200,-202},{-18,-202},{-18,-141},{39,-141}}, color={0,0,127} )  )   )
         }
         package BaseClasses {
             Class RoomHeatMassBalance < <<replaceable package>> \n Medium: PartialMedium \n <<replaceable model>> \n air: PartialAirHeatMassBalance> << partial model >>  {
@@ -619,10 +954,10 @@ Buildings.BoundaryConditions.WeatherData.Bus -down--* "weaBus"RoomHeatMassBalanc
 Buildings.ThermalZones.Detailed.BaseClasses.SolarRadiationExchange -down-* "solRadExc"RoomHeatMassBalance
 Buildings.ThermalZones.Detailed.BaseClasses.InfraredRadiationGainDistribution -down-* "irRadGai"RoomHeatMassBalance
 Buildings.ThermalZones.Detailed.BaseClasses.InfraredRadiationExchange -down-* "irRadExc"RoomHeatMassBalance
-Buildings.ThermalZones.Detailed.BaseClasses.RadiationTemperature -down-* "radTem"RoomHeatMassBalance
+RadiationTemperature -down-* "radTem"RoomHeatMassBalance
 Buildings.HeatTransfer.Windows.BaseClasses.ShadeRadiation -down--* "shaRad[NConExtWin]"RoomHeatMassBalance
 Buildings.ThermalZones.Detailed.BaseClasses.HeatGain -down--* "heaGai"RoomHeatMassBalance
-Buildings.ThermalZones.Detailed.BaseClasses.RadiationAdapter -down--* "radiationAdapter"RoomHeatMassBalance
+RadiationAdapter -down--* "radiationAdapter"RoomHeatMassBalance
 ' Add -down--* "add"RoomHeatMassBalance
 ' Add -down--* "sumJToWin[NConExtWin]"RoomHeatMassBalance
 ' Sum -down--* "sumJFroWin[NConExtWin]"RoomHeatMassBalance
@@ -728,6 +1063,17 @@ GlazingSystemsGeneric <|..-down "glaSys" ConstructionWithWindow
 ' RealInput -down--* "QAbsUns_flow[size"ConstructionWithWindow
 ' RealInput -down--* "QAbsSha_flow[size"ConstructionWithWindow
 
+'=== PartialConstruction ===
+' Area -down--* "A"PartialConstruction
+' Area -down--* "AOpa"PartialConstruction
+OpaqueConstructionsGeneric -down--* "layers"PartialConstruction
+' Angle -down--* "til"PartialConstruction
+' HeatPort_a -down--* "opa_a"PartialConstruction
+' HeatPort_b -down--* "opa_b"PartialConstruction
+' Temperature -down--* "T_a_start"PartialConstruction
+' Temperature -down--* "T_b_start"PartialConstruction
+
+
 '=== GlazingSystemsGeneric ===
 GlassesGeneric -down-* "glass[]"GlazingSystemsGeneric
 GasesGeneric -down-* "gas[]"GlazingSystemsGeneric
@@ -743,5 +1089,54 @@ Material -down--* "material[nLay]"OpaqueConstructionsGeneric
 ' Emissivity -down--* "absSol_b"OpaqueConstructionsGeneric
 SurfaceRoughness -down--* "roughness_a"OpaqueConstructionsGeneric
 
+'=== ExteriorBoundaryConditions ===
+' Exterior -down--* "conOpa[nCon]"ExteriorBoundaryConditions
+ExteriorConvection -down--* "conMod"ExteriorBoundaryConditions
+Bus -down--* "weaBus"ExteriorBoundaryConditions
+' DirectTiltedSurface -down--* "HDirTil["ExteriorBoundaryConditions
+' DiffusePerez -down--* "HDifTil[nCon]"ExteriorBoundaryConditions
+' Area -down--* "AOpa[nCon]"ExteriorBoundaryConditions
 
+'=== RadiationTemperature ===
+PartialSurfaceInterfaceRadiative <|--down RadiationTemperature
+
+'=== PartialSurfaceInterfaceRadiative ===
+PartialSurfaceInterface <|--down PartialSurfaceInterfaceRadiative
+
+'=== PartialSurfaceInterface ===
+ConstructionRecords <|--down PartialSurfaceInterface
+
+'=== InfraredRadiationExchange ===
+PartialSurfaceInterfaceRadiative <|--down InfraredRadiationExchange
+' Time -down--* "t0"InfraredRadiationExchange
+' RadiosityInflow -down--* "JInConExtWin_internal["InfraredRadiationExchange
+' HeatFlowRate -down--* "J[nTot]"InfraredRadiationExchange
+' HeatFlowRate -down--* "G[nTot]"InfraredRadiationExchange
+' Temperature -down--* "TOpa[nOpa]"InfraredRadiationExchange
+' HeatFlowRate -down--* "Q_flow[nTot]"InfraredRadiationExchange
+' Temperature -down--* "T0"InfraredRadiationExchange
+
+'=== ExteriorBoundaryConditionsWithWindow ===
+ExteriorBoundaryConditions <|--down ExteriorBoundaryConditionsWithWindow
+' ExteriorHeatTransfer -down--* "conExtWin[nCon]"ExteriorBoundaryConditionsWithWindow
+' RadiosityOutflow -down--* "JOutUns[nCon]"ExteriorBoundaryConditionsWithWindow
+' RadiosityInflow -down--* "JInUns[nCon]"ExteriorBoundaryConditionsWithWindow
+' RadiosityOutflow -down--* "JOutSha[nCon]"ExteriorBoundaryConditionsWithWindow
+' RadiosityInflow -down--* "JInSha[nCon]"ExteriorBoundaryConditionsWithWindow
+
+'=== InfraredRadiationGainDistribution ===
+PartialSurfaceInterfaceRadiative <|--down InfraredRadiationGainDistribution
+' RealInput -down--* "uSha[NConExtWin]"InfraredRadiationGainDistribution
+' RealInput -down--* "Q_flow"InfraredRadiationGainDistribution
+' RadiosityOutflow[NConExtWin -down--* "JOutConExtWin"InfraredRadiationGainDistribution
+' ShadingSignal -down--* "shaSig[NConExtWin]"InfraredRadiationGainDistribution
+
+'=== SolarRadiationExchange ===
+PartialSurfaceInterfaceRadiative <|--down SolarRadiationExchange
+' Emissivity -down--* "tauGla[NConExtWin]"SolarRadiationExchange
+' RealInput -down--* "JInDifConExtWin[NConExtWin]"SolarRadiationExchange
+' RealInput -down--* "JInDirConExtWin[NConExtWin]"SolarRadiationExchange
+' RealOutput -down--* "HOutConExtWin[NConExtWin]"SolarRadiationExchange
+' HeatFlowRate -down--* "JOutConExtWin[NConExtWin]"SolarRadiationExchange
+' HeatFlowRate -down--* "Q_flow[NTot]"SolarRadiationExchange
 @enduml

@@ -1,0 +1,198 @@
+@startuml MixedAirParameterOnly
+hide circle
+skinparam {
+    defaultFontName "Noto Sans JP"
+}
+
+package Buildings{
+    package ThermalZones.Detailed{
+        Class MixedAir < <<replaceable package>> \n Medium: PartialMedium > << model >>  {
+            + << parameter >> use_C_flow: Boolean "部屋への微量物質の流出入を有効にするかどうか"
+            + << parameter >> energyDynamics: Modelica.Fluid.Types.Dynamics "初期状態"
+            + << parameter >> mSenFac: Real "空気量の顕熱質量をスケーリングするための係数"
+            + << parameter >> p_start: Medium.AbsolutePressure
+            + << parameter >> T_start: Medium.Temperature 
+            + << parameter >> X_start[Medium.nX]: Medium.MassFraction
+            + << parameter >> C_start[Medium.nC]: Medium.ExtraProperty
+            + << parameter >> C_nominal[Medium.nC]: Medium.ExtraProperty
+        }
+        package BaseClasses {
+            Class RoomHeatMassBalance < <<replaceable package>> \n Medium: PartialMedium \n <<replaceable model>> \n air: PartialAirHeatMassBalance> << partial model >>  {
+                ' + << parameter >> nPorts: Integer "FluidPortsの数"
+                + << parameter >> AFlo: Area "部屋面積"
+                + << parameter >> hRoo: Length "部屋高さ"
+                + << parameter >> linearizeRadiation: Boolean "ふく射強度を線形化するかどうか"
+                + << parameter >> steadyStateWindow: Boolean "窓に熱容量を追加するかどうか"
+                + << parameter >> intConMod: InteriorConvection "室内側の熱伝達方式"
+                + << parameter >> hIntFixed: CoefficientOfHeatTransfer "室内側熱伝達係数"
+                + << parameter >> extConMod: ExteriorConvection "室外側の熱伝達方式"
+                + << parameter >> hExtFixed: CoefficientOfHeatTransfer "室外側熱伝達係数"
+                + << parameter >> m_flow_nominal: MassFlowRate "定格質量流量"
+                + << parameter >> sampleModel: Boolean "時間サンプリングの有無"
+            }
+
+            class ConstructionRecords << record >>  {
+                + << parameter >> datConExt[NConExt]: ParameterConstruction "窓のない外装のパラメータ"
+                + << parameter >> datConExtWin[NConExtWin]: ParameterConstructionWithWindow "窓のある外装のパラメータ"
+                + << parameter >> datConPar[NConPar]: ParameterConstruction "空間内の間仕切りのパラメータ"
+                + << parameter >> datConBou[NConBou]: ParameterConstruction "空間外との境界構造体のパラメータ"
+                + << parameter >> surBou[NSurBou]: OpaqueSurface "熱伝導が空間外でモデル化された不透明な面のパラメータ"
+                + << parameter >> dummyCon: Brick120 "上書きされるので無視してよい"
+                + << parameter >> dummyGlaSys: SingleClear3 "上書きされるので無視してよい"
+            }
+
+            Class ConstructionNumbers << record >> {
+                + << parameter >> nConExt: Integer "窓のない外装の数"
+                + << parameter >> nConExtWin: Integer  "窓のある外装の数"
+                + << parameter >> nConPar: Integer "空間内の間仕切りの数"
+                + << parameter >> nConBou: Integer "空間外との境界構造体の数"
+                + << parameter >> nSurBou: Integer "熱伝導が空間外でモデル化された不透明な面の数"
+            }
+            Class PartialAirHeatMassBalance < <<replaceable package>> \n Medium: PartialMedium > << partial model >>  {
+                ' + << parameter >> nPorts: Integer: "FluidPortsの数"
+                ' + << parameter >> haveShade: Boolean "1つ以上の窓が日除けを有するかどうか"
+                ' + << parameter >> V: Volume "部屋の体積"
+            }
+
+            Class MixedAirHeatMassBalance << model >>  {
+                ' + << parameter >> m_flow_nominal: MassFlowRate "定格質量流量"
+                ' + << parameter >> conMod: InteriorConvection "室内側の熱伝達方式"
+                ' + << parameter >> hFixed: CoefficientOfHeatTransfer "室内側熱伝達係数"
+                ' + << parameter >> use_C_flow: Boolean "空気に添加される微量物質の質量流量を考慮するかどうか"
+            }
+        }
+    }
+}
+
+' PartialAirHeatMassBalance <|---up MixedAir
+
+'AppliedForce af;
+'replaceable model AppliedForce = PartialForce;の形式に治すと
+'replaceable BaseClasses.PartialAirHeatMassBalance air constrainedby BaseClasses.PartialAirHeatMassBalance(
+'は，
+'replaceable model air = PartialAirHeatMassBalance
+'air air;
+'なので，AppliedForceがair, PartialForceがPartialAirHeatMassBalanceである．
+
+'=== MixedAir ===
+RoomHeatMassBalance <|--down MixedAir : "<< redeclare >> \n air → MixedAirHeatMassBalance"
+MixedAirHeatMassBalance <--down MixedAir
+
+'=== RoomHeatMassBalance ===
+PartialAirHeatMassBalance <|..-down RoomHeatMassBalance : "air\n<< redeclare >>\nMedium→Medium"
+'redeclare Buildings.ThermalZones.Detailed.BaseClasses.MixedAirHeatMassBalance air{final energyDynamics=energyDynamics, final massDynamics = energyDynamics, final p_start=p_start, final T_start=T_start, final X_start=X_start, final C_start=C_start, final C_nominal=C_nominal, final mSenFac=mSenFac, final m_flow_nominal=m_flow_nominal, final homotopyInitialization=homotopyInitialization, final conMod=intConMod, final hFixed=hIntFixed, final use_C_flow = use_C_flow  },
+'datConExt{each T_a_start = T_start, each T_b_start = T_start  },
+'datConExtWin{each T_a_start = T_start, each T_b_start = T_start},
+'datConBou{each T_a_start = T_start, each T_b_start = T_start},
+'datConPar{each T_a_start = T_start, each T_b_start = T_start}}  
+ConstructionRecords <|---down RoomHeatMassBalance
+
+' VesselFluidPorts_b -down--* "ports[nPorts]"RoomHeatMassBalance
+' Area -down--* "AFlo"RoomHeatMassBalance
+' Length -down--* "hRoo"RoomHeatMassBalance
+' HeatPort_a -down--* "heaPorAir"RoomHeatMassBalance
+' HeatPort_a -down--* "heaPorRad"RoomHeatMassBalance
+' Construction -down--* "conExt[NConExt]"RoomHeatMassBalance
+' ConstructionWithWindow -down--* "conExtWin[NConExtWin]"RoomHeatMassBalance
+' Construction -down--* "conPar[NConPar]"RoomHeatMassBalance
+' Construction -down--* "conBou[NConBou]"RoomHeatMassBalance
+' Buildings.HeatTransfer.Types.InteriorConvection -down--* "intConMod"RoomHeatMassBalance
+' CoefficientOfHeatTransfer -down--* "hIntFixed"RoomHeatMassBalance
+' ExteriorConvection -down--* "extConMod"RoomHeatMassBalance
+' CoefficientOfHeatTransfer -down--* "hExtFixed"RoomHeatMassBalance
+' MassFlowRate -down--* "m_flow_nominal"RoomHeatMassBalance
+' RealInput -down--* "uWin[nConExtWin]"RoomHeatMassBalance
+' HeatPort_a -down--* "surf_conBou[nConBou]"RoomHeatMassBalance
+' HeatPort_a -down--* "surf_surBou[nSurBou]"RoomHeatMassBalance
+' RealInput -down--* "qGai_flow[3]"RoomHeatMassBalance
+' Add -down--* "add"RoomHeatMassBalance
+' Add -down--* "sumJToWin[NConExtWin]"RoomHeatMassBalance
+' Sum -down--* "sumJFroWin[NConExtWin]"RoomHeatMassBalance
+' PrescribedTemperature -down--* "TSha[NConExtWin]"RoomHeatMassBalance
+
+
+'=== MixedAirHeatMassBalance ===
+PartialAirHeatMassBalance <|--down MixedAirHeatMassBalance
+ConstructionRecords <|--down PartialAirHeatMassBalance
+
+'=== ConstructionRecords ===
+ConstructionNumbers <|--down ConstructionRecords
+' ParameterConstructionWithWindow -down--* "datConExtWin[NConExtWin]" ConstructionRecords
+' ParameterConstruction -down--* "datConExt[NConExt]" ConstructionRecords
+' ParameterConstruction -down--* "datConPar[NConPar]" ConstructionRecords
+' ParameterConstruction -down--* "datConBou[NConBou]" ConstructionRecords
+' OpaqueSurface -down--* "surBou[NSurBou]" ConstructionRecords
+'=== ParameterConstruction ===
+' PartialParameterConstruction <|--down ParameterConstruction
+
+'=== ParameterConstructionWithWindow ===
+' PartialParameterConstruction <|---down ParameterConstructionWithWindow
+' Area -down--* "A" ParameterConstructionWithWindow
+' Length -down--* "hWin" ParameterConstructionWithWindow
+' Length -down--* "wWin" ParameterConstructionWithWindow
+' Overhang -down-* "ove" ParameterConstructionWithWindow
+' SideFins -down-* "sidFin" ParameterConstructionWithWindow
+' GlazingSystemsGeneric -down-* "glaSys" ParameterConstructionWithWindow
+
+'=== PartialParameterConstruction ===
+' OpaqueConstructionsGeneric -down-* "layers" PartialParameterConstruction
+' CFDBoundaryConditions -down--* "boundaryCondition" PartialParameterConstruction
+
+'=== OpaqueSurface ===
+' OpaqueConstructionsGeneric <|-down OpaqueSurface
+' CFDBoundaryConditions -down--* "boundaryCondition"OpaqueSurface
+
+'=== SideFins ===
+' Record <|---down SideFins
+' Length -down--* "h"SideFins
+' Length -down--* "dep"SideFins
+' Length -down--* "gap"SideFins
+
+'=== Brick120 ===
+' OpaqueConstructionsGeneric <|---down Brick120
+
+'=== Construction ===
+' PartialConstruction <|--down "final AOpa = A" Construction
+
+'=== ConstructionWithWindow ===
+' PartialConstruction <|--down "final AOpa = A - AWin"ConstructionWithWindow
+' Area -down--* "AWin"ConstructionWithWindow
+' parameter <|..-down "HeatTransfer.Data.GlazingSystems.Generic" ConstructionWithWindow
+' GlazingSystemsGeneric <|..-down "glaSys" ConstructionWithWindow
+' HeatPort_a -down--* "glaUns_a"ConstructionWithWindow
+' HeatPort_a -down--* "glaSha_a"ConstructionWithWindow
+' HeatPort_a -down--* "fra_a"ConstructionWithWindow
+' RealInput -down--* "uSha"ConstructionWithWindow
+' HeatPort_b -down--* "glaUns_b"ConstructionWithWindow
+' HeatPort_b -down--* "glaSha_b"ConstructionWithWindow
+' HeatPort_b -down--* "fra_b"ConstructionWithWindow
+' RealInput -down--* "QAbsUns_flow[size"ConstructionWithWindow
+' RealInput -down--* "QAbsSha_flow[size"ConstructionWithWindow
+
+'=== PartialConstruction ===
+' Area -down--* "A"PartialConstruction
+' Area -down--* "AOpa"PartialConstruction
+' OpaqueConstructionsGeneric -down--* "layers"PartialConstruction
+' Angle -down--* "til"PartialConstruction
+' HeatPort_a -down--* "opa_a"PartialConstruction
+' HeatPort_b -down--* "opa_b"PartialConstruction
+' Temperature -down--* "T_a_start"PartialConstruction
+' Temperature -down--* "T_b_start"PartialConstruction
+
+
+'=== GlazingSystemsGeneric ===
+' GlassesGeneric -down-* "glass[]"GlazingSystemsGeneric
+' GasesGeneric -down-* "gas[]"GlazingSystemsGeneric
+' ShadesGeneric -down-* "shade"GlazingSystemsGeneric
+
+'===OpaqueConstructionsGeneric===
+' package -down--* "OpaqueConstructions"OpaqueConstructions
+' MaterialPropertiesPackage <|---up OpaqueConstructions
+' Material -down--* "material[nLay]"OpaqueConstructionsGeneric
+' Emissivity -down--* "absIR_a"OpaqueConstructionsGeneric
+' Emissivity -down--* "absIR_b"OpaqueConstructionsGeneric
+' Emissivity -down--* "absSol_a"OpaqueConstructionsGeneric
+' Emissivity -down--* "absSol_b"OpaqueConstructionsGeneric
+' SurfaceRoughness -down--* "roughness_a"OpaqueConstructionsGeneric
+
+@enduml
